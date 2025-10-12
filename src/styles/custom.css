@@ -1,0 +1,24 @@
+/* Custom styles for Dev Bahrul documentation */
+
+/* Remove the ::after from the link element to avoid redundancy */
+header .title-wrapper a::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Adjust title size - make it smaller */
+header .title-wrapper a span {
+    font-size: 1.125rem !important; /* Reduced from default size */
+    line-height: 1.3 !important;
+}
+
+/* Add tagline after the title span with closer spacing */
+header .title-wrapper a span::after {
+    content: "Developer Documentation";
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--sl-color-gray-3);
+    margin-top: 0.125rem; /* Reduced spacing */
+    line-height: 1.2;
+}
