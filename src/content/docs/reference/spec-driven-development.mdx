@@ -1,0 +1,1067 @@
+---
+title: Spec-Driven Development
+description: Comprehensive comparison of spec-driven development approaches for AI coding assistants - BMAD, OpenSpec, Kiro, CodeGuide, and traditional coding
+---
+
+import { Steps, Tabs, TabItem, Card, CardGrid, Aside, LinkCard, FileTree } from '@astrojs/starlight/components';
+
+A comprehensive guide comparing different approaches to spec-driven development when working with AI coding assistants like Claude Code, GitHub Copilot, Cursor, and others.
+
+---
+
+## 🎯 What is Spec-Driven Development?
+
+**Spec-driven development** is the practice of writing specifications before writing code—or asking an AI tool to write code. Instead of coding first and documenting later, you start with a spec that acts as a **contract** for how your code should behave.
+
+<Aside type="tip" title="Why It Matters for AI">
+In the AI coding era, specifications act as a **North Star** for AI agents. They provide:
+- A guide AI can reference during implementation
+- A benchmark to validate work against
+- A way to keep AI oriented on large, complex tasks
+- Clear intent that prevents AI from going off-track
+</Aside>
+
+### The Problem Without Specs
+
+When working with AI coding assistants without specifications:
+- ❌ **Context loss** - AI forgets previous decisions
+- ❌ **Inconsistent outputs** - Different results each time
+- ❌ **Scope creep** - AI adds unwanted features
+- ❌ **Rework cycles** - Constant corrections and revisions
+- ❌ **Misalignment** - AI misunderstands requirements
+
+### The Benefits With Specs
+
+With proper specifications:
+- ✅ **Predictable results** - Consistent AI outputs
+- ✅ **Clear expectations** - Humans and AI aligned
+- ✅ **Faster iteration** - Less back-and-forth
+- ✅ **Better quality** - AI stays on track
+- ✅ **Maintainability** - Clear documentation from day one
+
+---
+
+## 📊 Comparison Overview
+
+| Approach | Type | Cost | Complexity | Best For |
+|----------|------|------|------------|----------|
+| **BMAD-METHOD** | Framework | Free (OSS) | High | Large teams, enterprise projects |
+| **OpenSpec** | CLI Tool | Free (OSS) | Low | Any project size, version control |
+| **GitHub Spec Kit** | CLI Toolkit | Free (OSS) | Medium | GitHub users, structured workflow |
+| **Kiro.dev** | IDE Platform | Paid | Medium | Individual devs, startups |
+| **CodeGuide.dev** | Documentation | Free | Low | Documentation-focused projects |
+| **No Spec (Traditional)** | Ad-hoc | Free | Low | Small scripts, prototypes |
+
+---
+
+## 🔍 Detailed Comparison
+
+### 1. BMAD-METHOD™
+
+<LinkCard
+  title="BMAD-METHOD on GitHub"
+  description="Universal AI Agent Framework for software development"
+  href="https://github.com/bmad-code-org/BMAD-METHOD"
+/>
+
+#### What It Is
+**BMAD** (Breakthrough Method of Agile AI-Driven Development) is a comprehensive AI agent framework that uses a two-phase approach: **Agentic Planning** followed by **Context-Engineered Development**.
+
+#### Key Features
+
+<CardGrid>
+  <Card title="Agentic Planning" icon="rocket">
+    Dedicated AI agents (Analyst, PM, Architect) collaborate to create detailed requirements and architecture documents
+  </Card>
+
+  <Card title="Context Engineering" icon="document">
+    Scrum Master agent transforms plans into hyper-detailed development stories with full context embedded
+  </Card>
+
+  <Card title="Multi-Domain" icon="puzzle">
+    Expansion packs for creative writing, business strategy, wellness, education beyond just coding
+  </Card>
+
+  <Card title="Customizable" icon="setting">
+    Build custom AI agents for specialized fields and workflows
+  </Card>
+</CardGrid>
+
+#### How It Works
+
+```mermaid
+Analyst Agent → PM Agent → Architect Agent → Scrum Master → Developer
+   (Research)   (Requirements)  (Architecture)   (Stories)    (Implementation)
+```
+
+<Aside type="note">
+**Two-Phase Approach:**
+1. **Planning Phase** - AI agents collaborate to create comprehensive project documentation
+2. **Development Phase** - Stories contain full context, eliminating context loss during implementation
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **Comprehensive framework** - Covers entire development lifecycle | **Steep learning curve** - Complex setup and methodology |
+| **Eliminates context loss** - Full context in every story | **Heavy tooling** - Requires Node.js v20+, web UI, IDE integration |
+| **Team collaboration** - Multiple AI agents work together | **Overhead for small projects** - Overkill for simple tasks |
+| **Enterprise-ready** - Designed for large, complex projects | **Team coordination** - Best with dedicated team members |
+| **Extensible** - Supports custom agents and domains | |
+
+#### Best For
+
+- Large enterprise projects
+- Teams with dedicated roles (PM, Architect, Developer)
+- Complex multi-phase projects
+- Organizations building multiple AI-driven products
+
+#### Installation
+
+<Steps>
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/bmad-code-org/BMAD-METHOD.git
+   cd BMAD-METHOD
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   bun install
+   ```
+
+3. **Start the Web UI**
+   ```bash
+   bun run dev
+   ```
+
+4. **Open in Browser**
+   Visit `http://localhost:3000` to access the BMAD planning interface
+
+</Steps>
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - bmad/
+    - requirements/
+      - analyst-research.md
+      - pm-requirements.md
+    - architecture/
+      - system-design.md
+      - tech-decisions.md
+    - stories/
+      - story-001.md
+      - story-002.md
+    - agents/
+      - custom-agent-config.json
+  - src/
+    - (your source code)
+  - .bmad/
+    - config.json
+</FileTree>
+
+<Aside type="note">
+BMAD generates comprehensive documentation in the `bmad/` folder with separate folders for requirements, architecture, and development stories.
+</Aside>
+
+---
+
+### 2. OpenSpec
+
+<LinkCard
+  title="OpenSpec on GitHub"
+  description="Spec-driven development CLI tool for AI coding assistants"
+  href="https://github.com/Fission-AI/OpenSpec/"
+/>
+
+#### What It Is
+**OpenSpec** is a lightweight CLI tool that implements spec-driven development with a simple two-folder model: current specs and proposed changes. It integrates seamlessly with existing AI coding tools.
+
+#### Key Features
+
+<CardGrid>
+  <Card title="Two-Folder Model" icon="open-book">
+    `specs/` for current truth, `changes/` for proposed updates
+  </Card>
+
+  <Card title="Change Management" icon="forward-slash">
+    Draft, review, implement, and archive changes with clear audit trail
+  </Card>
+
+  <Card title="Universal Integration" icon="puzzle">
+    Works with Claude Code, Cursor, Copilot, and any AI coding tool
+  </Card>
+
+  <Card title="No API Keys" icon="rocket">
+    Fully local, no external dependencies or accounts required
+  </Card>
+</CardGrid>
+
+#### How It Works
+
+<FileTree>
+- openspec/
+  - specs/
+    - feature-a.md
+    - feature-b.md
+  - changes/
+    - add-feature-c.md
+    - update-feature-a.md
+</FileTree>
+
+<Aside type="note">
+- **specs/** - Source of truth (current state)
+- **changes/** - Proposed changes (review state)
+</Aside>
+
+<Aside type="tip" title="Workflow">
+- **Draft** a change proposal in `changes/`
+- **Review** and align with AI on specifications
+- **Implement** tasks referencing the change
+- **Archive** - Move to `specs/` to update source of truth
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **Simple and lightweight** - Minimal setup, just folders and markdown | **Manual process** - Requires discipline to follow workflow |
+| **Version control friendly** - Works perfectly with Git | **No GUI** - Command-line only |
+| **Tool agnostic** - Compatible with any AI coding assistant | **Limited automation** - No automatic spec generation |
+| **Clear audit trail** - Every change is tracked and reviewable | **No multi-agent** - Single developer focused |
+| **No dependencies** - No API keys or external services | |
+
+#### Best For
+
+- Solo developers and small teams
+- Projects already using Git
+- Teams using multiple AI coding tools
+- Projects requiring clear change history
+
+#### Installation
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+
+<Steps>
+
+1. **Install Globally**
+   ```bash
+   bun add -g @fission-ai/openspec
+   ```
+
+2. **Navigate to Your Project**
+   ```bash
+   cd your-project
+   ```
+
+3. **Initialize OpenSpec**
+   ```bash
+   openspec init
+   ```
+
+4. **Verify Setup**
+   Check that `openspec/` folder was created with `specs/` and `changes/` subdirectories
+
+</Steps>
+
+</TabItem>
+<TabItem label="npm">
+
+<Steps>
+
+1. **Install Globally**
+   ```bash
+   npm install -g @fission-ai/openspec@latest
+   ```
+
+2. **Navigate to Your Project**
+   ```bash
+   cd your-project
+   ```
+
+3. **Initialize OpenSpec**
+   ```bash
+   openspec init
+   ```
+
+4. **Verify Setup**
+   Check that `openspec/` folder was created with `specs/` and `changes/` subdirectories
+
+</Steps>
+
+</TabItem>
+</Tabs>
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - openspec/
+    - specs/
+      - feature-authentication.md
+      - feature-dashboard.md
+      - api-endpoints.md
+    - changes/
+      - add-payment-feature.md
+      - update-auth-flow.md
+    - archived/
+      - completed-change-001.md
+  - src/
+    - (your source code)
+  - .openspec/
+    - config.json
+</FileTree>
+
+<Aside type="note">
+OpenSpec uses a simple two-folder model: `specs/` for current state and `changes/` for proposed updates. Completed changes get archived for reference.
+</Aside>
+
+---
+
+### 3. GitHub Spec Kit
+
+<LinkCard
+  title="GitHub Spec Kit"
+  description="Official GitHub toolkit for spec-driven development with AI coding agents"
+  href="https://github.com/github/spec-kit"
+/>
+
+#### What It Is
+**GitHub Spec Kit** is an official toolkit from GitHub that streamlines software development through a structured spec-driven approach with AI assistance. It treats specifications as executable guides rather than disposable planning documents.
+
+#### Key Features
+
+<CardGrid>
+  <Card title="Slash Commands" icon="forward-slash">
+    Built-in commands like `/speckit.specify`, `/speckit.plan`, `/speckit.tasks` for structured workflow
+  </Card>
+
+  <Card title="Multi-Agent Support" icon="puzzle">
+    Works with Claude, GitHub Copilot, Gemini, Cursor, and other AI coding agents
+  </Card>
+
+  <Card title="Intent-Driven" icon="star">
+    Focus on "what" and "why" before determining technical implementation
+  </Card>
+
+  <Card title="Executable Specs" icon="rocket">
+    Specifications become living guides for development, not throwaway documents
+  </Card>
+</CardGrid>
+
+#### How It Works
+
+```
+Constitution → Specify → Plan → Tasks → Implement
+  (Project setup) (Requirements) (Architecture) (Breakdown) (Code)
+```
+
+<Aside type="note">
+**Workflow:**
+1. **Constitution** - Define project principles and constraints
+2. **Specify** - Create detailed specifications
+3. **Plan** - Architect the technical approach
+4. **Tasks** - Break down into implementation tasks
+5. **Implement** - Execute with AI assistance
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **Official GitHub tool** - Backed by GitHub's expertise | **Relatively new** - Smaller community compared to alternatives |
+| **Slash command workflow** - Simple, intuitive commands | **Command-line focused** - No GUI interface |
+| **Multi-agent compatible** - Works with any AI coding tool | **Python dependency** - Requires Python/uv installation |
+| **Structured process** - Clear phases from spec to implementation | **Learning curve** - Need to understand the workflow phases |
+| **Technology agnostic** - Start with intent, not tech stack | |
+
+#### Best For
+
+- Developers using GitHub and AI coding agents
+- Teams wanting official GitHub-backed tools
+- Projects requiring structured spec-to-code workflow
+- Organizations adopting spec-driven practices
+
+#### Installation
+
+<Steps>
+
+1. **Install uv** (Python package manager)
+   <Tabs>
+   <TabItem label="macOS/Linux">
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+   </TabItem>
+   <TabItem label="Windows">
+   ```bash
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Install Spec Kit**
+   ```bash
+   uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+   ```
+
+3. **Initialize a Project**
+   ```bash
+   specify init my-project
+   ```
+
+4. **Or Initialize in Existing Directory**
+   ```bash
+   specify init . --ai claude
+   ```
+
+</Steps>
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - .speckit/
+    - constitution.md
+    - specifications/
+      - feature-001-spec.md
+      - feature-002-spec.md
+    - plans/
+      - architecture-plan.md
+      - implementation-plan.md
+    - tasks/
+      - task-breakdown.md
+    - config.json
+  - src/
+    - (your source code)
+  - README.md
+</FileTree>
+
+<Aside type="note">
+GitHub Spec Kit organizes specs into clear phases: constitution → specifications → plans → tasks. Each phase guides the next with structured slash commands.
+</Aside>
+
+---
+
+### 4. Kiro.dev
+
+<LinkCard
+  title="Kiro.dev IDE"
+  description="AI-powered IDE with built-in spec-driven development"
+  href="https://kiro.dev"
+/>
+
+#### What It Is
+**Kiro** is an AI-powered Integrated Development Environment designed specifically for spec-driven development. It transforms prompts into structured requirements, system design, and implementation tasks.
+
+#### Key Features
+
+<CardGrid>
+  <Card title="Spec-to-Code" icon="star">
+    Automatically turns prompts into requirements, design, and discrete tasks
+  </Card>
+
+  <Card title="Autonomous Hooks" icon="setting">
+    Trigger tasks on events (file save) - generate docs, tests, optimize code
+  </Card>
+
+  <Card title="Auto Mode" icon="rocket">
+    Mixed frontier models for autonomous complex feature development
+  </Card>
+
+  <Card title="Multi-Modal" icon="puzzle">
+    Support for design images, screenshots, and other inputs
+  </Card>
+</CardGrid>
+
+#### How It Works
+
+```
+User Prompt → Requirements → System Design → Implementation Tasks → Code
+```
+
+<Aside type="note">
+Kiro's "Auto" mode can handle complex features autonomously by breaking them into specs, designs, and implementation steps automatically.
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **All-in-one IDE** - Complete development environment | **Paid service** - Not free (pricing varies) |
+| **Automatic spec generation** - AI creates specs from prompts | **Platform lock-in** - Proprietary IDE, not tool-agnostic |
+| **Autonomous agents** - Background tasks for docs, tests, optimization | **Learning curve** - New IDE to learn |
+| **Multi-language** - Python, JavaScript, TypeScript, and more | **Cloud dependency** - Requires internet connection |
+| **Import VS Code settings** - Easy migration from existing setup | |
+
+#### Best For
+
+- Individual developers
+- Startups building MVPs quickly
+- Teams wanting integrated spec-driven workflow
+- Developers comfortable with new IDEs
+
+#### Installation
+
+<Steps>
+
+1. **Visit Kiro.dev**
+   Go to [kiro.dev](https://kiro.dev)
+
+2. **Sign Up**
+   Create an account (GitHub sign-in available)
+
+3. **Import Settings** (Optional)
+   Import your VS Code settings for faster setup
+
+4. **Start Your First Project**
+   Click "New Project" and start with a prompt
+
+</Steps>
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - .kiro/
+    - specs/
+      - feature-001-spec.md
+      - feature-002-spec.md
+    - requirements/
+      - user-requirements.md
+    - design/
+      - system-architecture.md
+      - component-breakdown.md
+    - tasks/
+      - implementation-tasks.json
+    - settings.json
+  - src/
+    - (your source code generated by Kiro)
+  - tests/
+    - (auto-generated tests)
+  - docs/
+    - (auto-generated documentation)
+</FileTree>
+
+<Aside type="note">
+Kiro automatically generates and manages specs in the `.kiro/` folder. The IDE handles spec generation, task breakdown, and implementation tracking automatically.
+</Aside>
+
+---
+
+### 5. CodeGuide.dev
+
+<LinkCard
+  title="CodeGuide.dev"
+  description="Documentation generator for AI coding projects"
+  href="https://www.codeguide.dev"
+/>
+
+#### What It Is
+**CodeGuide** focuses on creating detailed documentation for AI coding projects. It helps maintain comprehensive project documentation that serves as specifications for AI assistants.
+
+#### Key Features
+
+<CardGrid>
+  <Card title="Documentation Focus" icon="document">
+    Generate and maintain detailed project documentation
+  </Card>
+
+  <Card title="AI-Friendly" icon="star">
+    Documentation formatted for AI assistant consumption
+  </Card>
+
+  <Card title="Living Docs" icon="setting">
+    Keep documentation in sync with codebase
+  </Card>
+</CardGrid>
+
+#### How It Works
+
+CodeGuide emphasizes documentation as the specification layer, ensuring that:
+1. All features have clear documentation
+2. Documentation is accessible to AI assistants
+3. Changes update documentation automatically
+
+<Aside type="note">
+CodeGuide is more documentation-focused than the other approaches, treating comprehensive docs as the specification.
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **Documentation first** - Ensures comprehensive project docs | **Limited scope** - Primarily documentation, not full workflow |
+| **AI-optimized** - Format works well with AI assistants | **Manual maintenance** - Requires keeping docs updated |
+| **Lightweight** - Minimal overhead | **Less structure** - Not as formal as other approaches |
+| **Integration friendly** - Works with existing tools | |
+
+#### Best For
+
+- Documentation-focused teams
+- Projects requiring extensive API docs
+- Teams using various AI coding tools
+- Maintaining legacy projects
+
+#### Installation
+
+<Aside type="note">
+CodeGuide.dev focuses on documentation practices rather than specific tooling installation. Follow their documentation guidelines for your existing project.
+</Aside>
+
+Visit [codeguide.dev](https://www.codeguide.dev) for documentation best practices.
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - docs/
+    - README.md
+    - ARCHITECTURE.md
+    - API.md
+    - features/
+      - authentication.md
+      - dashboard.md
+      - api-endpoints.md
+    - guides/
+      - setup.md
+      - deployment.md
+    - CHANGELOG.md
+  - src/
+    - (your source code)
+  - .codeguide/
+    - templates/
+    - config.json
+</FileTree>
+
+<Aside type="note">
+CodeGuide emphasizes comprehensive documentation in the `docs/` folder. Documentation serves as the specification that AI assistants reference during development.
+</Aside>
+
+---
+
+### 6. Traditional Approach (No Spec)
+
+#### What It Is
+The traditional ad-hoc approach where you directly prompt AI assistants without formal specifications or documentation.
+
+#### How It Works
+
+```
+Prompt → Code → Test → Debug → Iterate
+```
+
+<Aside type="caution" title="Common Issues">
+Without specs, you'll encounter:
+- Repeated explanations to AI
+- Inconsistent results across sessions
+- Lost context when switching tasks
+- Difficulty maintaining large codebases
+</Aside>
+
+#### Pros & Cons
+
+| Pros ✅ | Cons ❌ |
+|---------|---------|
+| **Quick start** - No setup required | **Context loss** - AI forgets previous decisions |
+| **Flexible** - Change direction easily | **Inconsistent** - Different results each time |
+| **Simple** - No methodology to learn | **Scaling issues** - Breaks down on large projects |
+| **Fast for prototypes** - Great for quick experiments | **Maintainability** - Hard to onboard new team members |
+| | **No audit trail** - Unclear why decisions were made |
+
+#### Best For
+
+- Quick prototypes and experiments
+- Learning and exploring new technologies
+- Very small scripts (< 100 lines)
+- Throwaway code
+
+#### Project Directory Structure
+
+<FileTree>
+- your-project/
+  - src/
+    - index.js
+    - utils.js
+    - (unstructured code files)
+  - package.json
+  - README.md
+  - (no formal specs or documentation)
+</FileTree>
+
+<Aside type="caution">
+Traditional approach has minimal structure. Code is written directly without specifications, making it difficult to maintain consistency or onboard new team members.
+</Aside>
+
+---
+
+## 🎯 Decision Matrix
+
+Choose the right approach for your needs:
+
+<Tabs>
+<TabItem label="BMAD-METHOD">
+
+**Choose BMAD-METHOD if you:**
+
+- ✅ Working on enterprise-scale projects
+- ✅ Have dedicated team roles (PM, Architect, etc.)
+- ✅ Need comprehensive planning phase
+- ✅ Want multi-agent collaboration
+- ✅ Building multiple related products
+
+**Ideal Team Size:** 3-10+ members
+
+</TabItem>
+
+<TabItem label="OpenSpec">
+
+**Choose OpenSpec if you:**
+
+- ✅ Want simple, git-friendly workflow
+- ✅ Using multiple AI coding tools
+- ✅ Need clear change tracking
+- ✅ Prefer lightweight solutions
+- ✅ Value version control integration
+
+**Ideal Team Size:** 1-5 members
+
+</TabItem>
+
+<TabItem label="GitHub Spec Kit">
+
+**Choose GitHub Spec Kit if you:**
+
+- ✅ Using GitHub and AI coding agents
+- ✅ Want official GitHub-backed tool
+- ✅ Need structured workflow with phases
+- ✅ Prefer slash command interface
+- ✅ Value intent-driven development
+
+**Ideal Team Size:** 1-10 members
+
+</TabItem>
+
+<TabItem label="Kiro.dev">
+
+**Choose Kiro.dev if you:**
+
+- ✅ Want all-in-one IDE solution
+- ✅ Comfortable with paid tools
+- ✅ Need automatic spec generation
+- ✅ Want autonomous agent features
+- ✅ Building complex features quickly
+
+**Ideal Team Size:** 1-3 members
+
+</TabItem>
+
+<TabItem label="CodeGuide.dev">
+
+**Choose CodeGuide.dev if you:**
+
+- ✅ Documentation is your priority
+- ✅ Need API documentation
+- ✅ Have existing tooling you like
+- ✅ Want lightweight integration
+
+**Ideal Team Size:** Any
+
+</TabItem>
+
+<TabItem label="No Spec">
+
+**Choose No Spec if you:**
+
+- ✅ Building quick prototypes
+- ✅ Experimenting/learning
+- ✅ Very small projects (&lt;100 lines)
+- ✅ Throwaway code
+
+**Ideal Team Size:** 1 developer
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📊 Feature Comparison
+
+| Feature | BMAD | OpenSpec | GitHub Spec Kit | Kiro | CodeGuide | No Spec |
+|---------|------|----------|-----------------|------|-----------|---------|
+| **Learning Curve** | High | Low | Medium | Medium | Low | None |
+| **Setup Time** | Hours | Minutes | 10-15 mins | Minutes | Minutes | None |
+| **Cost** | Free | Free | Free | Paid | Free | Free |
+| **Team Size** | 3-10+ | 1-5 | 1-10 | 1-3 | Any | 1 |
+| **Multi-Agent** | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
+| **Version Control** | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ Yes | ⚠️ Manual |
+| **Auto Spec Gen** | ✅ Yes | ❌ No | ⚠️ Guided | ✅ Yes | ⚠️ Partial | ❌ No |
+| **IDE Integration** | ✅ Yes | ⚠️ Manual | ⚠️ Manual | ✅ Built-in | ⚠️ Manual | N/A |
+| **Change Tracking** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Manual | ❌ No |
+| **Documentation** | ✅ Auto | 📝 Manual | ✅ Structured | ✅ Auto | ✅ Focus | ❌ None |
+| **Tool Agnostic** | ❌ No | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
+| **Offline Support** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
+
+---
+
+## 🚀 Getting Started Guide
+
+### Step 1: Assess Your Needs
+
+<Tabs>
+<TabItem label="Solo Developer">
+**Recommended: OpenSpec or Kiro**
+
+If you're working alone:
+- **OpenSpec** - If you want free, simple, git-integrated
+- **Kiro** - If you want automated specs and don't mind paying
+</TabItem>
+
+<TabItem label="Small Team (2-5)">
+**Recommended: OpenSpec**
+
+For small teams:
+- Simple workflow everyone can follow
+- Git integration for collaboration
+- Tool flexibility (everyone can use their preferred IDE)
+</TabItem>
+
+<TabItem label="Large Team (6+)">
+**Recommended: BMAD-METHOD**
+
+For larger teams:
+- Structured roles (PM, Architect, Developer)
+- Comprehensive planning phase
+- Multi-agent collaboration
+</TabItem>
+
+<TabItem label="Documentation Focus">
+**Recommended: CodeGuide.dev**
+
+If documentation is critical:
+- Generate and maintain comprehensive docs
+- Ensure AI has context from documentation
+- Keep docs in sync with code
+</TabItem>
+</Tabs>
+
+### Step 2: Implement
+
+<Steps>
+1. **Install your chosen tool**
+   Follow the installation instructions for your selected approach
+
+2. **Create your first spec**
+   Start small with one feature or module
+
+3. **Test with AI assistant**
+   Prompt your AI tool referencing the spec
+
+4. **Iterate and refine**
+   Improve your spec format based on results
+
+5. **Scale up**
+   Expand to more features as you get comfortable
+</Steps>
+
+---
+
+## 💡 Best Practices
+
+<Aside type="tip">
+
+### Universal Best Practices (All Approaches)
+
+1. **Start Small** - Begin with one feature, not entire project
+2. **Be Specific** - Clear requirements = better AI outputs
+3. **Version Control** - Always commit specs with code
+4. **Review Together** - Human + AI review specs before coding
+5. **Iterate Often** - Improve specs based on what works
+6. **Document Decisions** - Explain WHY, not just WHAT
+7. **Keep It Updated** - Specs should reflect reality
+
+</Aside>
+
+### BMAD-Specific Tips
+- Invest time in the planning phase
+- Let AI agents collaborate, don't rush them
+- Review agent outputs before proceeding
+- Customize agents for your domain
+
+### OpenSpec-Specific Tips
+- Create templates for common change types
+- Use meaningful file names in `changes/`
+- Archive promptly after implementation
+- Commit specs with related code changes
+
+### Kiro-Specific Tips
+- Start with clear, detailed prompts
+- Use Auto mode for complex features
+- Leverage autonomous hooks for repetitive tasks
+- Import VS Code settings for faster onboarding
+
+### CodeGuide-Specific Tips
+- Document as you go, not after
+- Include examples in documentation
+- Keep API docs comprehensive
+- Link code to relevant documentation
+
+---
+
+## 📈 Real-World Examples
+
+### Example 1: Building a Dashboard (OpenSpec)
+
+```markdown
+<!-- openspec/changes/add-analytics-dashboard.md -->
+# Add Analytics Dashboard
+
+## Requirements
+- Display key metrics: users, revenue, engagement
+- Real-time updates via WebSocket
+- Responsive design (mobile + desktop)
+- Export data to CSV
+
+## Technical Design
+- React + Recharts for visualization
+- TanStack Query for data fetching
+- Cloudflare Workers for backend
+- ClickHouse for analytics data
+
+## Implementation Tasks
+1. Create dashboard layout component
+2. Build metric cards with Recharts
+3. Implement WebSocket connection
+4. Add CSV export functionality
+5. Write unit tests for calculations
+
+## Acceptance Criteria
+- [ ] Dashboard loads in < 2 seconds
+- [ ] Real-time updates every 5 seconds
+- [ ] Mobile responsive (320px+)
+- [ ] CSV export includes all visible data
+```
+
+### Example 2: API Endpoint (BMAD)
+
+**After Agentic Planning, Scrum Master generates:**
+
+```markdown
+# Story: Create User Registration Endpoint
+
+## Context
+Part of the Authentication System (see architect-doc-001.md)
+Implements requirements from PM-REQ-003.md
+
+## Full Implementation Details
+- Endpoint: POST /api/auth/register
+- Validation: Email, password (8+ chars, 1 uppercase, 1 number)
+- Database: Users table (see schema.sql)
+- Security: bcrypt hash (cost 10), rate limit (5/min per IP)
+- Response: JWT token (expires 24h)
+
+## Error Handling
+- 400: Invalid input (specific field errors)
+- 409: Email already exists
+- 429: Rate limit exceeded
+- 500: Server error
+
+## Testing
+- Unit tests for validation logic
+- Integration tests for full flow
+- Load test: 100 concurrent registrations
+
+## Dependencies
+- bcrypt: ^5.1.0
+- jsonwebtoken: ^9.0.0
+- express-rate-limit: ^6.0.0
+```
+
+### Example 3: Feature Spec (Kiro Auto Mode)
+
+**Prompt to Kiro:**
+> "Create a real-time collaborative whiteboard with drawing tools, shapes, text, and multi-user cursors"
+
+**Kiro generates:**
+1. Requirements document
+2. System architecture
+3. Component breakdown
+4. API specification
+5. Implementation tasks
+
+Then Auto mode implements everything autonomously.
+
+---
+
+## 🔗 Resources
+
+### Official Documentation
+
+<CardGrid>
+  <LinkCard
+    title="BMAD-METHOD Docs"
+    description="Comprehensive guide to BMAD framework"
+    href="https://github.com/bmad-code-org/BMAD-METHOD"
+  />
+
+  <LinkCard
+    title="OpenSpec GitHub"
+    description="OpenSpec tool and documentation"
+    href="https://github.com/Fission-AI/OpenSpec/"
+  />
+
+  <LinkCard
+    title="Kiro.dev Platform"
+    description="Sign up and start building with Kiro"
+    href="https://kiro.dev"
+  />
+
+  <LinkCard
+    title="GitHub Spec Kit"
+    description="GitHub's official spec-driven toolkit"
+    href="https://github.com/github/spec-kit"
+  />
+</CardGrid>
+
+### Community & Tutorials
+
+- [Spec-Driven Development Blog (GitHub)](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/)
+- [AI Native Dev - Spec-Driven with Claude Code](https://ainativedev.io/news/spec-driven-dev-with-claude-code)
+- [The New Stack - Spec-Driven for Scalable AI Agents](https://thenewstack.io/spec-driven-development-the-key-to-scalable-ai-agents/)
+
+---
+
+## 🎯 Conclusion
+
+Spec-driven development is becoming essential for effective AI-assisted coding. The right approach depends on your:
+
+- **Project size** - Solo vs team vs enterprise
+- **Budget** - Free vs paid tools
+- **Workflow** - Existing tools vs new platform
+- **Complexity** - Simple scripts vs complex systems
+- **Team structure** - Dedicated roles vs generalists
+
+### Quick Recommendations
+
+| Scenario | Best Choice | Why |
+|----------|-------------|-----|
+| **Solo dev, small project** | OpenSpec | Simple, free, git-friendly |
+| **Solo dev, complex project** | Kiro.dev | Automated specs, powerful features |
+| **GitHub user, structured workflow** | GitHub Spec Kit | Official tool, slash commands, multi-agent |
+| **Small team** | OpenSpec | Easy collaboration via Git |
+| **Large enterprise** | BMAD-METHOD | Multi-agent, comprehensive planning |
+| **Documentation focus** | CodeGuide.dev | Docs as specs |
+| **Quick prototype** | No Spec | Speed over structure |
+
+<Aside type="tip" title="Start Today">
+Don't overthink it! Pick one approach and try it on your next feature. You can always switch or combine approaches as you learn what works best for your workflow.
+</Aside>
+
+---
+
+*Last updated: October 2025*

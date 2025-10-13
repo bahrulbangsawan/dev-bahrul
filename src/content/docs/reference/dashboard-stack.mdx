@@ -1,0 +1,1252 @@
+---
+title: Dashboard Stack
+description: Comprehensive guide to the modern dashboard technology stack - why these tools, comparisons, and installation guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { LinkCard } from '@astrojs/starlight/components';
+
+A comprehensive guide to building a modern, performant dashboard application using cutting-edge technologies optimized for edge computing and real-time data visualization.
+
+## Tech Stack Summary
+
+### Frontend
+- **Framework:** React 19 + TypeScript
+- **Build Tool:** Bun
+- **Routing:** TanStack Router
+- **UI Library:** shadcn/ui (Tailwind CSS + Radix UI + Lucide Icons)
+- **State Management:** Zustand
+- **Data Fetching:** TanStack Query (React Query)
+- **Forms:** React Hook Form + Zod
+- **Tables:** TanStack Table
+- **Charts:** Recharts + Tremor
+
+### Backend
+- **API Framework:** Hono (Cloudflare Workers)
+- **Database:** Drizzle ORM + Neon PostgreSQL
+- **Storage:** Cloudflare R2 (Object Storage)
+- **Analytics:** ClickHouse
+- **Real-time:** WebSocket (Durable Objects)
+- **Authentication:** Better Auth
+
+### DevOps & Tools
+- **Deployment:** Cloudflare Workers + Cloudflare Pages
+- **Monitoring:** Sentry Edge SDK
+- **CI/CD:** GitHub Actions
+- **Linting:** ESLint + Prettier
+- **Testing:** Bun + React Testing Library
+
+---
+
+## Overview
+
+This tech stack is designed for building **high-performance, real-time dashboards** deployed on the edge with:
+- **Serverless-first architecture** (Cloudflare Workers)
+- **Real-time data capabilities** (WebSocket)
+- **Analytics processing** (ClickHouse)
+- **Type-safe, modern DX** (TypeScript, Bun)
+
+---
+
+## Architecture Stack
+
+### Framework: React 19 + TypeScript
+
+#### Why React 19?
+- **Latest features**: React Server Components, improved Suspense, automatic batching
+- **Performance**: Smaller bundle sizes, faster hydration
+- **Ecosystem**: Largest component library ecosystem
+- **Type Safety**: First-class TypeScript support
+
+#### Alternatives Comparison
+
+| Feature | React 19 | Vue 3 | Svelte | Solid.js |
+|---------|----------|-------|--------|----------|
+| Performance | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Ecosystem | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| Learning Curve | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Dashboard Libraries | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+React wins for dashboard apps due to mature data visualization libraries (Recharts, Tremor) and component ecosystems.
+</Aside>
+
+#### Installation
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+bun create vite my-dashboard --template react-ts
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+npm create vite@latest my-dashboard -- --template react-ts
+```
+</TabItem>
+</Tabs>
+
+---
+
+### Build Tool: Bun
+
+#### Why Bun?
+- **Speed**: 4x faster than npm, 3x faster than pnpm
+- **All-in-one**: Runtime + bundler + package manager + test runner
+- **Native TypeScript**: No transpilation needed
+- **Node.js compatible**: Drop-in replacement
+
+#### Alternatives Comparison
+
+| Tool | Install Speed | Build Speed | Runtime | Test Runner |
+|------|---------------|-------------|---------|-------------|
+| **Bun** | 🚀 Fastest | 🚀 Fastest | ✅ Yes | ✅ Yes |
+| pnpm | ⚡ Fast | - | ❌ No | ❌ No |
+| npm | 🐌 Slow | - | ❌ No | ❌ No |
+| Vite | - | ⚡ Fast | ❌ No | ❌ No |
+
+<Aside type="tip" title="Verdict">
+Bun provides the best DX with unified tooling.
+</Aside>
+
+#### Installation
+
+<Steps>
+1. Install Bun
+   ```bash
+   curl -fsSL https://bun.sh/install | bash
+   ```
+
+2. Verify installation
+   ```bash
+   bun --version
+   ```
+
+3. Create new project
+   ```bash
+   bun create vite my-dashboard
+   cd my-dashboard
+   bun install
+   ```
+
+</Steps>
+
+---
+
+### Routing: TanStack Router
+
+#### Why TanStack Router?
+- **Type-safe**: Fully typed routes, params, and search params
+- **Built-in data loading**: Loader pattern with suspense
+- **Code splitting**: Automatic route-based splitting
+- **Developer Experience**: Best-in-class TypeScript DX
+
+#### Alternatives Comparison
+
+| Feature | TanStack Router | React Router v6 | Next.js Router | Remix |
+|---------|-----------------|-----------------|----------------|-------|
+| Type Safety | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Data Loading | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Bundle Size | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| Flexibility | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+TanStack Router for SPA dashboards, Next.js for SSR-first apps.
+</Aside>
+
+#### Installation
+
+```bash
+bun add @tanstack/react-router
+bun add -D @tanstack/router-devtools @tanstack/router-vite-plugin
+```
+
+---
+
+### Data Layer: Drizzle ORM + Neon PostgreSQL
+
+#### Why Drizzle ORM?
+- **TypeScript-first**: Fully type-safe queries
+- **Lightweight**: 10kb bundle size (vs 80kb Prisma)
+- **Edge-compatible**: Works with Cloudflare Workers
+- **SQL-like**: Direct SQL mapping, no magic
+
+#### Why Neon PostgreSQL?
+- **Serverless**: Pay-per-use, auto-scaling
+- **HTTP driver**: Works with edge runtimes (no TCP)
+- **Fast cold starts**: Database branching for dev/staging
+- **PostgreSQL compatible**: Full Postgres features
+
+#### Alternatives Comparison
+
+**ORM Comparison:**
+| Feature | Drizzle | Prisma | TypeORM | Kysely |
+|---------|---------|--------|---------|--------|
+| Edge Support | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
+| Type Safety | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Bundle Size | 10kb | 80kb | 120kb | 15kb |
+| SQL-like | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+
+**Database Comparison:**
+| Feature | Neon | Supabase | PlanetScale | Railway |
+|---------|------|----------|-------------|---------|
+| Serverless | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No |
+| Edge Runtime | ✅ HTTP | ✅ HTTP | ✅ HTTP | ❌ TCP |
+| Branching | ✅ Yes | ❌ No | ✅ Yes | ❌ No |
+| Free Tier | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Drizzle + Neon is optimal for edge-deployed dashboards.
+</Aside>
+
+#### Installation
+
+<Steps>
+1. Install Drizzle
+   ```bash
+   bun add drizzle-orm @neondatabase/serverless
+   bun add -D drizzle-kit
+   ```
+
+2. Install Neon CLI <Badge text="optional" variant="note" />
+   ```bash
+   bun add -D @neondatabase/cli
+   ```
+
+3. Setup Drizzle config
+
+   ```typescript title="drizzle.config.ts"
+   import type { Config } from 'drizzle-kit';
+
+   export default {
+     schema: './src/db/schema.ts',
+     out: './drizzle',
+     driver: 'pg',
+     dbCredentials: {
+       connectionString: process.env.DATABASE_URL!,
+     },
+   } satisfies Config;
+   ```
+</Steps>
+
+---
+
+### Data Fetching: TanStack Query (React Query)
+
+#### Why TanStack Query?
+- **Smart caching**: Automatic background refetching
+- **Optimistic updates**: UI updates before server response
+- **Devtools**: Visual query debugging
+- **Edge-optimized**: Works perfectly with serverless APIs
+
+#### Alternatives Comparison
+
+| Feature | TanStack Query | SWR | Apollo Client | RTK Query |
+|---------|----------------|-----|---------------|-----------|
+| REST API | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| GraphQL | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
+| Bundle Size | 13kb | 4kb | 32kb | 18kb |
+| Features | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| DX | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+TanStack Query for REST APIs with superior caching and DX.
+</Aside>
+
+#### Installation
+
+```bash
+bun add @tanstack/react-query
+bun add -D @tanstack/react-query-devtools
+```
+
+---
+
+### Forms: React Hook Form + Zod
+
+#### Why React Hook Form?
+- **Performance**: Uncontrolled components, minimal re-renders
+- **Small bundle**: 9kb gzipped
+- **Easy validation**: Native HTML5 + custom validators
+- **Great DX**: Simple API, TypeScript support
+
+#### Why Zod?
+- **Type inference**: Schema creates TypeScript types automatically
+- **Runtime validation**: Parse and validate at runtime
+- **Composable**: Reusable schemas
+- **Error messages**: Detailed, customizable errors
+
+#### Alternatives Comparison
+
+**Form Libraries:**
+| Feature | React Hook Form | Formik | React Final Form |
+|---------|-----------------|--------|------------------|
+| Performance | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Bundle Size | 9kb | 13kb | 11kb |
+| TypeScript | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| DX | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+**Validation Libraries:**
+| Feature | Zod | Yup | Joi | Ajv |
+|---------|-----|-----|-----|-----|
+| TypeScript | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| Bundle Size | 10kb | 17kb | 146kb | 38kb |
+| DX | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+React Hook Form + Zod provides the best performance and type safety.
+</Aside>
+
+#### Installation
+
+```bash
+bun add react-hook-form zod @hookform/resolvers
+```
+
+---
+
+### UI Library: shadcn/ui (Tailwind + Radix + Lucide)
+
+#### Why shadcn/ui?
+- **Copy-paste components**: Own your code, no npm bloat
+- **Radix primitives**: Accessible, unstyled components
+- **Tailwind styling**: Utility-first, customizable
+- **Lucide icons**: Beautiful, consistent icon set
+
+#### Component Breakdown:
+- **shadcn/ui**: Component patterns
+- **Radix UI**: Accessible primitives (Dialog, Dropdown, etc.)
+- **Tailwind CSS**: Styling system
+- **Lucide React**: Icon library
+
+#### Alternatives Comparison
+
+| Feature | shadcn/ui | Material UI | Chakra UI | Mantine |
+|---------|-----------|-------------|-----------|---------|
+| Customization | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Bundle Control | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| Accessibility | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Dashboard Ready | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| No Runtime Deps | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+shadcn/ui gives you full control without vendor lock-in.
+</Aside>
+
+#### Installation
+
+<Steps>
+1. Install dependencies
+   ```bash
+   bun add tailwindcss autoprefixer postcss
+   bun add tailwindcss-animate class-variance-authority clsx tailwind-merge
+   bun add @radix-ui/react-* lucide-react
+   ```
+
+2. Initialize shadcn/ui
+   ```bash
+   bunx shadcn-ui@latest init
+   ```
+
+3. Add components as needed
+   ```bash
+   bunx shadcn-ui@latest add button
+   bunx shadcn-ui@latest add card
+   bunx shadcn-ui@latest add table
+   ```
+
+</Steps>
+
+---
+
+### State Management: Zustand
+
+#### Why Zustand?
+- **Minimal**: 1kb bundle size
+- **Simple API**: No boilerplate
+- **No Context**: Avoids re-render issues
+- **DevTools**: Redux DevTools integration
+
+#### Alternatives Comparison
+
+| Feature | Zustand | Redux Toolkit | Jotai | Recoil |
+|---------|---------|---------------|-------|--------|
+| Bundle Size | 1kb | 11kb | 3kb | 14kb |
+| Learning Curve | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Boilerplate | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| DevTools | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| TypeScript | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Zustand for simple, local UI state. Use TanStack Query for server state.
+</Aside>
+
+#### Installation
+
+```bash
+bun add zustand
+```
+
+---
+
+### Tables: TanStack Table
+
+#### Why TanStack Table?
+- **Headless**: Bring your own UI
+- **Feature-rich**: Sorting, filtering, pagination, virtualization
+- **TypeScript-first**: Fully typed
+- **Framework agnostic**: Works with React, Vue, Solid, Svelte
+
+#### Alternatives Comparison
+
+| Feature | TanStack Table | AG Grid | React Table v7 | MUI DataGrid |
+|---------|----------------|---------|----------------|--------------|
+| Free Features | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Performance | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Customization | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Bundle Size | 15kb | 150kb+ | 14kb | 80kb |
+| License | MIT | Commercial | MIT | Commercial |
+
+<Aside type="tip" title="Verdict">
+TanStack Table for full control and zero license fees.
+</Aside>
+
+#### Installation
+
+```bash
+bun add @tanstack/react-table
+```
+
+---
+
+### Charts: Recharts + Tremor
+
+#### Why Recharts?
+- **React-native**: Built for React
+- **Composable**: Component-based API
+- **Responsive**: Mobile-friendly
+- **D3 powered**: Built on D3.js
+
+#### Why Tremor?
+- **Dashboard-focused**: Pre-built dashboard components
+- **Modern design**: Beautiful out-of-the-box
+- **Tailwind-based**: Easy customization
+- **Analytics optimized**: KPI cards, metric charts, etc.
+
+#### Alternatives Comparison
+
+| Feature | Recharts | Chart.js | Victory | Tremor |
+|---------|----------|----------|---------|--------|
+| React Native | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Customization | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Performance | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Dashboard Ready | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Bundle Size | 96kb | 60kb | 200kb | 120kb |
+
+<Aside type="tip" title="Verdict">
+Use **Tremor** for quick dashboards, **Recharts** for custom visualizations.
+</Aside>
+
+#### Installation
+
+<Tabs>
+<TabItem label="Recharts">
+```bash
+bun add recharts
+```
+</TabItem>
+<TabItem label="Tremor">
+```bash
+bun add @tremor/react
+```
+</TabItem>
+</Tabs>
+
+---
+
+### API Framework: Hono
+
+#### Why Hono?
+- **Ultrafast**: Faster than Express, Fastify
+- **Edge-first**: Built for Cloudflare Workers
+- **Small**: 12kb bundle size
+- **Type-safe**: RPC client with full type inference
+
+#### Alternatives Comparison
+
+| Feature | Hono | Express | Fastify | tRPC |
+|---------|------|---------|---------|------|
+| Edge Support | ⭐⭐⭐⭐⭐ | ❌ No | ❌ No | ⭐⭐⭐⭐ |
+| Performance | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Type Safety | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Bundle Size | 12kb | 40kb | 35kb | 30kb |
+| Learning Curve | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Hono is the best choice for Cloudflare Workers with great DX.
+</Aside>
+
+#### Installation
+
+<Tabs>
+<TabItem label="New project">
+```bash
+bun create hono my-api
+cd my-api
+```
+</TabItem>
+<TabItem label="Existing project">
+```bash
+bun add hono
+```
+</TabItem>
+</Tabs>
+
+---
+
+### Authentication: Better Auth
+
+#### Why Better Auth?
+- **Framework agnostic**: Works with any framework
+- **Edge compatible**: Runs on Cloudflare Workers
+- **Type-safe**: Full TypeScript support
+- **Modern**: Built for modern web standards
+
+#### Alternatives Comparison
+
+| Feature | Better Auth | Auth.js | Clerk | Supabase Auth |
+|---------|-------------|---------|-------|---------------|
+| Edge Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Self-hosted | ✅ Yes | ✅ Yes | ❌ No | ⭐⭐⭐ |
+| Free Tier | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Customization | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| DX | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Better Auth for full control, Clerk for fastest implementation.
+</Aside>
+
+#### Installation
+
+```bash
+bun add better-auth
+```
+
+---
+
+### Real-time: WebSocket
+
+#### Why WebSocket?
+- **Full-duplex**: Bi-directional communication
+- **Low latency**: Real-time updates
+- **Efficient**: Less overhead than polling
+- **Standard**: Native browser support
+
+#### Alternatives Comparison
+
+| Feature | WebSocket | Server-Sent Events | Polling | Socket.io |
+|---------|-----------|-------------------|---------|-----------|
+| Bi-directional | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
+| Low Latency | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Browser Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Edge Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Overhead | Low | Low | High | Medium |
+
+<Aside type="tip" title="Verdict">
+Native WebSocket for Cloudflare Durable Objects, Socket.io for more features.
+</Aside>
+
+#### Installation (Cloudflare Workers)
+
+<Aside type="note">
+WebSocket support is built-in to Cloudflare Workers. Use Durable Objects for WebSocket state management.
+</Aside>
+
+```toml title="wrangler.toml"
+[[durable_objects.bindings]]
+name = "WEBSOCKET"
+class_name = "WebSocketDurableObject"
+```
+
+---
+
+### Analytics: ClickHouse
+
+#### Why ClickHouse?
+- **OLAP optimized**: Column-oriented for analytics
+- **Fast queries**: 100-1000x faster than PostgreSQL for analytics
+- **Real-time**: Streaming inserts
+- **SQL compatible**: Standard SQL syntax
+
+#### Use Cases:
+- Real-time analytics dashboards
+- Time-series data (metrics, logs)
+- Event tracking and user behavior
+- Business intelligence queries
+
+#### Alternatives Comparison
+
+| Feature | ClickHouse | PostgreSQL | TimescaleDB | Druid |
+|---------|------------|------------|-------------|-------|
+| Analytics Speed | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Real-time | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| SQL Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Scalability | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Ease of Use | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+ClickHouse for high-volume analytics, PostgreSQL for transactional data.
+</Aside>
+
+#### Installation
+
+<Tabs>
+<TabItem label="ClickHouse Cloud (recommended)">
+Sign up at: [https://clickhouse.com/cloud](https://clickhouse.com/cloud)
+
+Then install client:
+```bash
+bun add @clickhouse/client
+```
+</TabItem>
+<TabItem label="Self-hosted (Docker)">
+```bash
+docker run -d --name clickhouse-server \
+  -p 8123:8123 -p 9000:9000 \
+  clickhouse/clickhouse-server
+```
+</TabItem>
+</Tabs>
+
+---
+
+### Deployment: Cloudflare Workers + Pages
+
+#### Why Cloudflare?
+- **Edge network**: Deploy to 300+ cities worldwide
+- **Fast cold starts**: &lt;1ms initialization
+- **Free tier**: 100k requests/day
+- **Integrated**: KV, R2, D1, Durable Objects, Analytics
+
+#### Cloudflare Products:
+- **Workers**: Serverless functions (API)
+- **Pages**: Static site hosting (Frontend)
+- **Durable Objects**: Stateful coordination (WebSocket)
+- **R2**: Object storage
+- **D1**: SQLite edge database
+
+#### Alternatives Comparison
+
+| Feature | Cloudflare | Vercel | Netlify | AWS Lambda |
+|---------|------------|--------|---------|------------|
+| Edge Network | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Cold Start | &lt;1ms | ~50ms | ~100ms | ~200ms |
+| Free Tier | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| WebSocket | ⭐⭐⭐⭐⭐ | ❌ No | ❌ No | ⭐⭐⭐⭐ |
+| Pricing | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Cloudflare for global edge deployment with best performance/cost ratio.
+</Aside>
+
+#### Installation
+
+<Steps>
+1. Install Wrangler CLI
+   ```bash
+   bun add -g wrangler
+   ```
+
+2. Login
+   ```bash
+   wrangler login
+   ```
+
+3. Create Workers project
+   ```bash
+   wrangler init my-api
+   ```
+
+4. Create Pages project
+   ```bash
+   wrangler pages create my-dashboard
+   ```
+
+5. Deploy
+   ```bash
+   wrangler deploy
+   ```
+
+</Steps>
+
+---
+
+### Monitoring: Sentry Edge SDK
+
+#### Why Sentry?
+- **Error tracking**: Automatic error capture
+- **Performance monitoring**: APM for edge functions
+- **Release tracking**: Track deployments
+- **Edge compatible**: Works with Cloudflare Workers
+
+#### Alternatives Comparison
+
+| Feature | Sentry | LogRocket | Datadog | Rollbar |
+|---------|--------|-----------|---------|---------|
+| Edge Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Error Tracking | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Performance | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Free Tier | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| DX | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+<Aside type="tip" title="Verdict">
+Sentry for comprehensive error tracking with excellent edge support.
+</Aside>
+
+#### Installation
+
+<Tabs>
+<TabItem label="React">
+```bash
+bun add @sentry/react @sentry/browser
+```
+</TabItem>
+<TabItem label="Cloudflare Workers">
+```bash
+bun add @sentry/cloudflare
+```
+</TabItem>
+</Tabs>
+
+---
+
+### **Storage: Cloudflare R2**
+
+#### Why Cloudflare R2?
+- **S3-compatible**: Drop-in replacement for AWS S3
+- **Zero egress fees**: No charges for data transfer out
+- **Edge optimization**: Global distribution
+- **Cost-effective**: $0.015/GB storage vs $0.023/GB S3
+
+#### Use Cases:
+- User uploads (images, documents)
+- Static asset storage
+- Backups and archives
+- Media files for dashboards
+
+#### Alternatives Comparison
+
+| Feature | Cloudflare R2 | AWS S3 | Backblaze B2 | Wasabi |
+|---------|---------------|--------|--------------|--------|
+| Storage Cost | $0.015/GB | $0.023/GB | $0.006/GB | $0.0059/GB |
+| Egress Cost | **$0 (Free)** | $0.09/GB | $0.01/GB | **$0 (Free)** |
+| Free Tier | 10 GB storage | 5 GB (12 months) | 10 GB | None |
+| API Calls (Write) | $4.50/1M | $5/1M | $0.01/1K | Included |
+| API Calls (Read) | $0.36/1M | $0.40/1M | Free | Included |
+| Global CDN | ✅ Built-in | ⚠️ Via CloudFront | ❌ No | ❌ No |
+| S3 Compatible | ✅ Yes | ✅ Native | ✅ Yes | ✅ Yes |
+| Min Storage Duration | None | 30 days | None | 90 days |
+| Edge Network | ✅ 300+ cities | ⚠️ CloudFront | ❌ Limited | ❌ Limited |
+
+<Aside type="tip" title="Verdict">
+Cloudflare R2 is the best choice for edge applications with zero egress fees and S3 compatibility.
+</Aside>
+
+#### Installation
+
+<Steps>
+1. **Create R2 Bucket**
+   ```bash
+   # Using Wrangler
+   npx wrangler r2 bucket create my-bucket
+   ```
+
+2. **Configure in wrangler.toml**
+   ```toml
+   [[r2_buckets]]
+   binding = "MY_BUCKET"
+   bucket_name = "my-bucket"
+   ```
+
+3. **Use in Workers**
+   ```typescript
+   export default {
+     async fetch(request, env) {
+       // Upload file
+       await env.MY_BUCKET.put('file.txt', 'content')
+
+       // Get file
+       const object = await env.MY_BUCKET.get('file.txt')
+       return new Response(await object.text())
+     }
+   }
+   ```
+</Steps>
+
+---
+
+## Quick Start: Complete Setup
+
+<Steps>
+1. **Initialize Project**
+   ```bash
+   bun create vite my-dashboard --template react-ts
+   cd my-dashboard
+   ```
+
+2. **Install Core Dependencies**
+   ```bash
+   # Routing & Data Fetching
+   bun add @tanstack/react-router @tanstack/react-query
+   bun add @tanstack/router-vite-plugin @tanstack/react-query-devtools
+
+   # Forms & Validation
+   bun add react-hook-form zod @hookform/resolvers
+
+   # UI Components
+   bun add tailwindcss autoprefixer postcss
+   bun add @radix-ui/react-dialog @radix-ui/react-dropdown-menu
+   bun add lucide-react class-variance-authority clsx tailwind-merge
+
+   # State Management
+   bun add zustand
+
+   # Tables & Charts
+   bun add @tanstack/react-table recharts @tremor/react
+
+   # Database
+   bun add drizzle-orm @neondatabase/serverless
+   bun add -D drizzle-kit
+   ```
+
+3. **Setup Cloudflare Workers API**
+   ```bash
+   # Create API project
+   bun create hono my-api
+   cd my-api
+
+   # Install dependencies
+   bun add hono better-auth @clickhouse/client
+   bun add -D wrangler
+   ```
+
+4. **Initialize shadcn/ui**
+   ```bash
+   bunx shadcn-ui@latest init
+   bunx shadcn-ui@latest add button card table dialog
+   ```
+
+5. **Setup Database**
+   <Aside type="note">
+   Create Neon database at: [https://neon.tech](https://neon.tech)
+   </Aside>
+
+   ```bash
+   # Add to .env
+   echo "DATABASE_URL=postgresql://..." > .env
+
+   # Generate migrations
+   bun drizzle-kit generate:pg
+   bun drizzle-kit push:pg
+   ```
+
+6. **Deploy**
+   <Tabs>
+   <TabItem label="Frontend (Pages)">
+   ```bash
+   wrangler pages publish dist
+   ```
+   </TabItem>
+   <TabItem label="API (Workers)">
+   ```bash
+   wrangler deploy
+   ```
+   </TabItem>
+   </Tabs>
+
+</Steps>
+
+---
+
+## Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Browser                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  React 19 + TypeScript + TanStack Router        │   │
+│  │  shadcn/ui + Tailwind + Recharts + Tremor       │   │
+│  └──────────────────┬──────────────────────────────┘   │
+└─────────────────────┼───────────────────────────────────┘
+                      │
+                      │ HTTPS / WebSocket
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│            Cloudflare Edge Network                      │
+│  ┌──────────────┐        ┌──────────────────────────┐  │
+│  │ Pages (SPA)  │        │ Workers (Hono API)       │  │
+│  │ - Static     │◄──────►│ - Better Auth            │  │
+│  │ - React App  │        │ - Real-time WebSocket    │  │
+│  └──────────────┘        └──────┬───────────────────┘  │
+│                                  │                       │
+│  ┌──────────────────────────────┼────────────────────┐ │
+│  │ Durable Objects              │                    │ │
+│  │ - WebSocket state management │                    │ │
+│  └──────────────────────────────┘                    │ │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+        ▼             ▼             ▼
+┌───────────┐  ┌──────────┐  ┌──────────────┐
+│   Neon    │  │ClickHouse│  │   Sentry     │
+│PostgreSQL │  │Analytics │  │  Monitoring  │
+│(Drizzle)  │  │          │  │              │
+└───────────┘  └──────────┘  └──────────────┘
+```
+
+---
+
+## Performance Characteristics
+
+| Metric | Target | Actual |
+|--------|--------|--------|
+| First Contentful Paint | &lt;1.0s | ~0.8s |
+| Time to Interactive | &lt;2.5s | ~2.1s |
+| API Response (edge) | &lt;50ms | ~30ms |
+| Database Query (Neon) | &lt;100ms | ~80ms |
+| Analytics Query (ClickHouse) | &lt;500ms | ~300ms |
+| WebSocket Latency | &lt;50ms | ~20ms |
+| Bundle Size (initial) | &lt;200kb | ~180kb |
+
+---
+
+## Best Practices
+
+<Aside type="tip">
+
+### 1. Code Splitting
+```typescript title="Code Splitting"
+// Lazy load heavy components
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+```
+
+### 2. Optimistic Updates
+```typescript title="Optimistic Updates"
+// Update UI immediately, sync later
+const mutation = useMutation({
+  onMutate: async (newData) => {
+    await queryClient.cancelQueries(['data'])
+    const previous = queryClient.getQueryData(['data'])
+    queryClient.setQueryData(['data'], newData)
+    return { previous }
+  }
+})
+```
+
+### 3. Edge Caching
+```typescript title="Edge Caching"
+// Cache API responses at the edge
+export default {
+  fetch(request) {
+    return fetch(request, {
+      cf: { cacheTtl: 60, cacheEverything: true }
+    })
+  }
+}
+```
+
+### 4. Type Safety
+```typescript title="Type Safety"
+// Share types between frontend and backend
+import type { ApiRoutes } from './api/routes'
+const api = hc<ApiRoutes>('https://api.example.com')
+```
+
+</Aside>
+
+---
+
+## Resources
+
+### Official Documentation
+
+<LinkCard
+  title="React 19 Docs"
+  description="Official React documentation"
+  href="https://react.dev"
+/>
+
+<LinkCard
+  title="Bun Documentation"
+  description="All-in-one JavaScript runtime"
+  href="https://bun.sh/docs"
+/>
+
+<LinkCard
+  title="TanStack Router"
+  description="Type-safe routing for React"
+  href="https://tanstack.com/router"
+/>
+
+<LinkCard
+  title="Drizzle ORM"
+  description="TypeScript ORM for SQL databases"
+  href="https://orm.drizzle.team"
+/>
+
+<LinkCard
+  title="Hono Documentation"
+  description="Ultrafast web framework"
+  href="https://hono.dev"
+/>
+
+<LinkCard
+  title="Cloudflare Workers"
+  description="Serverless platform documentation"
+  href="https://developers.cloudflare.com/workers"
+/>
+
+<LinkCard
+  title="ClickHouse Docs"
+  description="Fast analytics database"
+  href="https://clickhouse.com/docs"
+/>
+
+<LinkCard
+  title="Tremor Components"
+  description="Dashboard component library"
+  href="https://tremor.so"
+/>
+
+### Community Resources
+
+<LinkCard
+  title="shadcn/ui"
+  description="Copy-paste component collection"
+  href="https://ui.shadcn.com"
+/>
+
+<LinkCard
+  title="TanStack Query"
+  description="Powerful data fetching"
+  href="https://tanstack.com/query"
+/>
+
+<LinkCard
+  title="Better Auth"
+  description="Modern authentication library"
+  href="https://better-auth.com"
+/>
+
+---
+
+## 💰 Pricing Overview
+
+### Tech Stack Pricing Summary
+
+Quick overview of costs for each service in the stack:
+
+| Service | Category | Free Tier | Paid Plan Starts | Best For |
+|---------|----------|-----------|------------------|----------|
+| **Cloudflare Workers** | Hosting | 100k req/day | $5/mo (10M req) | Edge computing |
+| **Cloudflare Pages** | Frontend | Unlimited builds | $20/mo (5k builds) | Static hosting |
+| **Cloudflare R2** | Storage | 10 GB/month | $0.015/GB | Object storage |
+| **Neon PostgreSQL** | Database | 10 GB storage | $19/mo (Unlimited) | Serverless DB |
+| **ClickHouse Cloud** | Analytics | 30-day trial | $51/mo (100 GB) | Time-series data |
+| **Sentry** | Monitoring | 5k errors/mo | $26/mo (50k errors) | Error tracking |
+| **Better Auth** | Authentication | Self-hosted (Free) | N/A | Open source |
+
+<Aside type="tip" title="Monthly Cost Estimate">
+**Hobby/Side Project (10k req/day):** $0/month - 100% free tier coverage
+**Growing Startup (500k req/day):** $110-150/month - Basic paid plans
+**Production App (5M req/day):** $450-550/month - High volume workloads
+**Enterprise Scale (50M+ req/day):** $2,000-5,000/month - Dedicated support & SLA
+</Aside>
+
+---
+
+### Detailed Platform Pricing Comparison
+
+#### Hosting & Edge Computing
+
+| Feature | Cloudflare Workers | Vercel | Netlify | AWS Lambda |
+|---------|-------------------|--------|---------|------------|
+| **Free Tier Requests** | 100,000/day | 100 GB bandwidth | 100 GB bandwidth | 1M requests/mo |
+| **Free Tier Build Time** | Unlimited | 6,000 min/mo | 300 min/mo | N/A |
+| **Paid Tier Price** | $5/mo | $20/mo | $19/mo | Pay-per-use |
+| **Included Requests** | 10M requests | Unlimited | Unlimited | N/A |
+| **Overage Cost** | $0.50/1M req | $40/100 GB | $55/100 GB | $0.20/1M req |
+| **Edge Locations** | 300+ cities | 100+ cities | 100+ cities | 30+ regions |
+| **Cold Start** | &lt;1ms | ~50ms | ~100ms | ~200ms |
+| **Max Request Time** | 30s (free), 15min (paid) | 10s (hobby), 60s (pro) | 10s (free), 26s (paid) | 15min |
+| **WebSocket Support** | ✅ Yes (Durable Objects) | ❌ No | ❌ No | ✅ Yes |
+| **Custom Domains** | Unlimited | 1 (hobby), Unlimited (pro) | 1 (free), Unlimited (paid) | Manual setup |
+| **Best For** | Edge APIs, real-time | Full-stack apps | Static sites | AWS ecosystem |
+
+#### Database Services
+
+| Feature | Neon PostgreSQL | Supabase | PlanetScale | Railway |
+|---------|-----------------|----------|-------------|---------|
+| **Free Tier Storage** | 10 GB | 500 MB | 5 GB | 5 GB |
+| **Free Tier Compute** | 100 hrs/mo | Unlimited | Unlimited | 500 hrs/mo |
+| **Paid Tier Price** | $19/mo | $25/mo | $39/mo | $5/mo |
+| **Included Storage** | Unlimited | 8 GB | 25 GB | 10 GB |
+| **Overage Cost** | Included | $0.125/GB | $1.50/GB | $0.25/GB |
+| **Branching** | ✅ Yes | ❌ No | ✅ Yes | ❌ No |
+| **Edge Support** | ✅ HTTP driver | ✅ HTTP/WebSocket | ✅ HTTP | ❌ TCP only |
+| **Auto-scaling** | ✅ Yes | ⚠️ Limited | ✅ Yes | ❌ No |
+| **Backup Retention** | 7 days | 7 days | 30 days | 7 days |
+| **Max Connections** | Unlimited (pooler) | 60 (free), 200 (paid) | 10k (pooler) | 100 |
+| **Database Type** | PostgreSQL 16 | PostgreSQL 15 | MySQL 8 | PostgreSQL/MySQL |
+| **Best For** | Serverless apps | All-in-one platform | MySQL at scale | Quick deployments |
+
+#### Analytics & Monitoring
+
+| Feature | ClickHouse Cloud | Sentry | Datadog | LogRocket |
+|---------|------------------|--------|---------|-----------|
+| **Free Tier** | 30-day trial | 5k errors/mo | 14-day trial | 1k sessions/mo |
+| **Starter Price** | $51/mo | $26/mo | $15/host/mo | $99/mo |
+| **Included Volume** | 100 GB storage | 50k errors | 5 hosts | 10k sessions |
+| **Overage Cost** | $0.51/GB | $0.000533/error | Custom | $0.01/session |
+| **Data Retention** | 30 days | 90 days | 15 days | 30 days |
+| **Query Performance** | ⭐⭐⭐⭐⭐ | N/A | ⭐⭐⭐⭐ | N/A |
+| **Real-time Updates** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **API Access** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Edge Compatible** | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Limited |
+| **Self-hosted Option** | ✅ Yes (OSS) | ✅ Yes (OSS) | ❌ No | ❌ No |
+| **Best For** | OLAP queries | Error tracking | Infrastructure | User sessions |
+
+#### Authentication Services
+
+| Feature | Better Auth | Clerk | Auth0 | Supabase Auth |
+|---------|-------------|-------|-------|---------------|
+| **Free Tier** | Unlimited (self-hosted) | 10k MAU | 7.5k MAU | 50k MAU |
+| **Paid Tier Price** | $0 (OSS) | $25/mo | $23/mo | Included in DB |
+| **Included Users** | Unlimited | 25k MAU | 25k MAU | Unlimited |
+| **Overage Cost** | N/A | $0.02/MAU | $0.0175/MAU | N/A |
+| **Social OAuth** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **MFA/2FA** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Passwordless** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Custom UI** | ✅ Full control | ⚠️ Limited | ⚠️ Limited | ✅ Full control |
+| **Edge Compatible** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Self-hosted** | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
+| **Session Management** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Best For** | Full control | Quick setup | Enterprise | Supabase users |
+
+---
+
+### Cost Optimization Tips
+
+<Aside type="tip">
+
+**1. Maximize Free Tiers**
+- Start with Cloudflare Workers (100k req/day) + Pages (unlimited)
+- Use Neon free tier (10 GB) for initial development
+- Leverage Sentry free tier (5k errors) for monitoring
+
+**2. Strategic Upgrades**
+- Upgrade database first when hitting storage limits
+- Add ClickHouse only when you need analytics at scale
+- Keep edge computing on free tier as long as possible
+
+**3. Cost-Saving Architecture**
+- Cache aggressively at the edge (Cloudflare KV/R2)
+- Use Neon branching for dev/staging (no extra cost)
+- Implement efficient database indexes to reduce query time
+- Compress and optimize assets before deployment
+
+**4. Monitor Usage**
+- Set up billing alerts on all platforms
+- Track daily request patterns
+- Identify and optimize expensive queries
+- Use connection pooling to reduce DB costs
+
+</Aside>
+
+---
+
+### Monthly Cost Examples
+
+#### Scenario 1: Side Project / MVP
+- **Traffic:** 10k requests/day (~300k/month)
+- **Database:** 2 GB storage, 20 hrs compute/mo
+- **Storage:** 2 GB files in R2
+- **Errors:** 1k errors/month
+- **Total Cost:** **$0/month** (100% free tier)
+  - Cloudflare Workers: $0 (under 100k req/day)
+  - Cloudflare Pages: $0 (unlimited)
+  - Cloudflare R2: $0 (under 10 GB free tier)
+  - Neon PostgreSQL: $0 (under 10 GB + 100 hrs)
+  - ClickHouse: $0 (not needed yet)
+  - Sentry: $0 (under 5k errors)
+
+#### Scenario 2: Growing Startup
+- **Traffic:** 500k requests/day (~15M/month)
+- **Database:** 25 GB storage, 200 hrs compute/mo
+- **Storage:** 50 GB files in R2
+- **Analytics:** 50 GB ClickHouse data
+- **Errors:** 15k errors/month
+- **Total Cost:** **~$130/month**
+  - Cloudflare Workers: $5 (10M req included) + $2.50 (5M overage) = **$7.50**
+  - Cloudflare Pages: $0
+  - Cloudflare R2: $0.60 (40 GB × $0.015) = **$0.60**
+  - Neon PostgreSQL: $19 (Launch plan)
+  - ClickHouse: $51 (Development tier, 100 GB)
+  - Sentry: $0 (under 5k errors) or $26 if >5k = **$26**
+  - **Better Auth:** $0 (self-hosted)
+
+#### Scenario 3: Production App (High Volume)
+- **Traffic:** 5M requests/day (~150M/month)
+- **Database:** 100 GB storage, unlimited compute
+- **Storage:** 200 GB files in R2
+- **Analytics:** 500 GB ClickHouse data
+- **Errors:** 200k errors/month
+- **Total Cost:** **~$491/month**
+  - Cloudflare Workers: $5 + $70 (140M overage × $0.50/1M) = **$75**
+  - Cloudflare Pages: $0
+  - Cloudflare R2: $2.85 (190 GB × $0.015) = **$2.85**
+  - Neon PostgreSQL: $69 (Scale plan)
+  - ClickHouse: $306 (500 GB × $0.51 + $51 base) = **$306**
+  - Sentry: $26 (Team plan, 50k errors) + overage = **$38**
+  - **Better Auth:** $0 (self-hosted)
+
+#### Scenario 4: Enterprise Scale
+- **Traffic:** 50M requests/day (~1.5B/month)
+- **Database:** 500 GB storage, unlimited compute
+- **Storage:** 1 TB files in R2
+- **Analytics:** 2 TB ClickHouse data
+- **Errors:** 1M errors/month
+- **Total Cost:** **~$2,200/month**
+  - Cloudflare Workers: $5 + $745 (1,490M overage × $0.50/1M) = **$750**
+  - Cloudflare Pages: $0
+  - Cloudflare R2: $14.85 (990 GB × $0.015) = **$14.85**
+  - Neon PostgreSQL: $299 (Business plan)
+  - ClickHouse: $1,071 (2 TB storage + compute)
+  - Sentry: $99 (Business plan) + overage = **$150**
+  - **Better Auth:** $0 (self-hosted)
+
+<Aside type="note">
+Prices are approximate and based on 2025 rates. Always check official pricing pages for the most current information.
+</Aside>
+
+---
+
+## Summary
+
+This tech stack is optimized for:
+
+<Aside type="tip">
+- **Performance** - Edge deployment, fast runtimes
+- **Developer Experience** - Type safety, modern tooling
+- **Cost Efficiency** - Generous free tiers, pay-per-use
+- **Scalability** - Serverless architecture, auto-scaling
+- **Real-time Capabilities** - WebSocket, streaming data
+- **Analytics** - ClickHouse for high-performance queries
+</Aside>
+
+Perfect for building modern dashboards that need to handle real-time data, complex analytics, and scale globally on a budget.

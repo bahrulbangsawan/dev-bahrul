@@ -1,0 +1,65 @@
+---
+title: Project 1 - Deployment
+description: Deploy Project 1 to production
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+# Deployment
+
+Deploy Project 1 to your favorite platform.
+
+## Quick Deploy
+
+<Tabs>
+<TabItem label="Vercel">
+
+```bash
+npm install -g vercel
+vercel deploy
+```
+
+</TabItem>
+<TabItem label="Netlify">
+
+```bash
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+</TabItem>
+<TabItem label="Cloudflare Pages">
+
+```bash
+npm run build
+npx wrangler pages deploy dist
+```
+
+</TabItem>
+</Tabs>
+
+## Environment Variables
+
+Set these environment variables in your deployment platform:
+
+- `API_URL` - Your API endpoint
+- `DATABASE_URL` - Database connection string
+- `SECRET_KEY` - Application secret
+
+<Aside type="caution">
+Never commit secrets to version control!
+</Aside>
+
+## Post-Deployment
+
+After deploying:
+
+1. ✅ Verify the site is accessible
+2. ✅ Check all API endpoints
+3. ✅ Monitor logs for errors
+4. ✅ Set up monitoring and alerts
+
+## Related Projects
+
+- [Project 2 Overview](/projects/project-2/overview)
+- [Project 3 Getting Started](/projects/project-3/getting-started)

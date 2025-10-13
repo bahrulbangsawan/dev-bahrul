@@ -1,0 +1,87 @@
+---
+title: Project 2 - Architecture
+description: System architecture and design decisions for Project 2
+---
+
+import { FileTree, Aside } from '@astrojs/starlight/components';
+
+# Architecture
+
+Understanding the system architecture of Project 2.
+
+## System Overview
+
+```
+Client (React) ↔ API Gateway ↔ Backend Services ↔ Database
+                                       ↓
+                                   Redis Cache
+```
+
+## Project Structure
+
+<FileTree>
+- project-2/
+  - frontend/
+    - src/
+      - components/
+      - pages/
+      - hooks/
+      - utils/
+    - public/
+    - package.json
+  - backend/
+    - src/
+      - routes/
+      - controllers/
+      - services/
+      - models/
+      - middleware/
+    - prisma/
+      - schema.prisma
+    - package.json
+  - infrastructure/
+    - kubernetes/
+    - terraform/
+  - docker-compose.yml
+</FileTree>
+
+## Design Decisions
+
+### Why Microservices?
+
+- **Scalability**: Scale services independently
+- **Maintainability**: Smaller, focused codebases
+- **Team autonomy**: Teams can work independently
+- **Technology flexibility**: Use best tool for each service
+
+### Database Strategy
+
+We use PostgreSQL with:
+- **Read replicas** for scaling reads
+- **Connection pooling** via PgBouncer
+- **Redis caching** for frequently accessed data
+
+<Aside type="note">
+Cache invalidation strategy: TTL-based with manual invalidation on updates
+</Aside>
+
+## API Architecture
+
+RESTful API with:
+- JWT authentication
+- Rate limiting
+- Request validation
+- Error handling middleware
+- OpenAPI documentation
+
+## Deployment
+
+Deployed on Kubernetes with:
+- **Auto-scaling**: Horizontal Pod Autoscaler
+- **Load balancing**: Kubernetes Ingress
+- **Monitoring**: Prometheus + Grafana
+- **Logging**: ELK Stack
+
+## Next Steps
+
+Check out the [API Documentation](/projects/project-2/api-docs) for endpoint details.

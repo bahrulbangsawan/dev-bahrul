@@ -1,0 +1,852 @@
+---
+title: Activity Registration Form
+description: Next.js registration form with Google Apps Script backend for KYZN activity token management
+---
+
+import { Steps, Tabs, TabItem, Card, CardGrid, Aside, FileTree, LinkCard } from '@astrojs/starlight/components';
+
+A modern Next.js 15 registration system for KYZN activity tokens, featuring branch-aware member search, real-time schedule updates, and smart token selection with duplicate prevention. Built with shadcn/ui and powered by Google Apps Script serverless backend.
+
+## Overview
+
+The **KYZN Activity Registration Form** is a serverless registration system that combines a modern React frontend with Google Apps Script backend. Users can search for members, view available activities, and register for up to 5 activity tokens with intelligent validation.
+
+### Key Features
+
+<CardGrid>
+  <Card title="Branch-Aware Search" icon="magnifier">
+    Search members by phone number with branch filtering (BSD/Kuningan) and automatic retry functionality
+  </Card>
+
+  <Card title="Smart Token Selection" icon="puzzle">
+    Select up to 5 activity tokens with automatic duplicate prevention and category limits (max 2 per category)
+  </Card>
+
+  <Card title="Real-Time Updates" icon="rocket">
+    Live schedule updates with manual refresh option and automatic availability tracking
+  </Card>
+
+  <Card title="Serverless Architecture" icon="setting">
+    Google Apps Script backend with zero hosting costs and automatic scaling
+  </Card>
+
+  <Card title="Progress Tracking" icon="star">
+    Real-time progress banner showing token usage and category distribution
+  </Card>
+
+  <Card title="Mobile Responsive" icon="mobile">
+    Mobile-first design with responsive layout and touch-optimized controls
+  </Card>
+</CardGrid>
+
+---
+
+## Tech Stack
+
+### Frontend
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Next.js** | 15.5.3 | React framework with App Router and static export |
+| **React** | 19.1.0 | UI library for component architecture |
+| **TypeScript** | 5.x | Type-safe development |
+| **Tailwind CSS** | 4.x | Utility-first CSS framework |
+| **shadcn/ui** | Latest | Radix UI + Tailwind component library |
+| **Lucide React** | 0.544.0 | Icon library |
+| **Sonner** | 2.0.7 | Toast notifications |
+
+### Backend
+
+| Technology | Purpose |
+|------------|---------|
+| **Google Apps Script** | Serverless API with LockService for concurrency |
+| **Google Sheets** | Database with three-sheet architecture |
+
+### Why This Stack?
+
+- **Next.js 15**: App Router for optimal performance, static export for GitHub Pages deployment
+- **shadcn/ui**: Accessible components built on Radix UI primitives with full customization
+- **Google Apps Script**: No server costs, direct Sheets integration, automatic scaling
+- **TypeScript**: Type safety prevents runtime errors and improves developer experience
+
+---
+
+## Project Structure
+
+<FileTree>
+- term-form/
+  - src/
+    - app/
+      - globals.css          # Global Tailwind styles
+      - layout.tsx           # Root layout with Toaster provider
+      - page.tsx             # Main registration page (client component)
+    - components/
+      - ui/                  # shadcn/ui base components
+        - alert.tsx
+        - badge.tsx
+        - button.tsx
+        - card.tsx
+        - command.tsx
+        - dialog.tsx
+        - input.tsx
+        - progress.tsx
+        - select.tsx
+        - separator.tsx
+        - skeleton.tsx
+        - sonner.tsx
+        - table.tsx
+        - tooltip.tsx
+      - IdentityCard.tsx     # Member information display
+      - NameSearchCard.tsx   # Phone search with branch selection
+      - ProgressBanner.tsx   # Token usage progress tracker
+      - SubmitCard.tsx       # Registration submission
+      - TokenSelectionCard.tsx # Individual token selector
+      - WhatsAppButton.tsx   # WhatsApp contact button
+      - index.ts             # Component barrel exports
+    - hooks/
+      - useMemberSearch.ts   # Member search with debouncing
+      - useSchedules.ts      # Schedule fetching with real-time updates
+      - useSelections.ts     # Token selection state management
+      - index.ts             # Hook barrel exports
+    - lib/
+      - utils.ts             # Utility functions (cn helper, etc.)
+  - gas-backend/
+    - Code.gs                # Google Apps Script backend
+    - DEPLOYMENT.md          # Backend deployment guide
+    - TESTING.md             # Testing guide with curl examples
+    - TROUBLESHOOTING.md     # Common issues and solutions
+  - docs/
+    - api-contract.md        # Complete API specifications
+    - integration-testing.md # Integration testing guide
+    - qa-checklist.md        # Quality assurance checklist
+  - public/                  # Static assets (if any)
+  - .env.local              # Environment variables (create this)
+  - components.json         # shadcn/ui configuration
+  - next.config.js          # Next.js static export config
+  - package.json            # Dependencies and scripts
+  - tsconfig.json           # TypeScript configuration
+  - README.md               # Project documentation
+</FileTree>
+
+### Component Architecture
+
+```
+page.tsx (Main Registration Flow)
+├── PhoneSearchCard
+│   └── useMemberSearch hook (debounced search)
+├── IdentityCard
+│   └── Display member information
+├── ProgressBanner
+│   └── useSelections hook (progress tracking)
+├── TokenSelectionCard (×5)
+│   ├── useSchedules hook (fetch schedules)
+│   └── useSelections hook (validate selections)
+├── SubmitCard
+│   └── Submit registration data
+└── WhatsAppButton (floating button)
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js 18+** or **Bun** runtime
+- Git for version control
+- Google account (for backend deployment)
+
+### Installation
+
+<Steps>
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd term-form
+   ```
+
+2. **Install dependencies**
+   <Tabs>
+   <TabItem label="npm">
+   ```bash
+   npm install
+   ```
+   </TabItem>
+   <TabItem label="Bun (faster)">
+   ```bash
+   bun install
+   ```
+   </TabItem>
+   </Tabs>
+
+3. **Configure environment**
+   Create `.env.local` in the project root:
+   ```bash
+   NEXT_PUBLIC_APPS_SCRIPT_URL=https://script.googleusercontent.com/macros/echo?user_content_key=YOUR_KEY&lib=YOUR_LIB
+   ```
+
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000`
+
+</Steps>
+
+<Aside type="tip">
+**Using Bun?** Replace `npm` commands with `bun` for faster installation and development server startup.
+</Aside>
+
+---
+
+## Configuration
+
+### Environment Variables
+
+Create `.env.local` in the project root:
+
+```bash title=".env.local"
+# Google Apps Script Web App URL
+NEXT_PUBLIC_APPS_SCRIPT_URL=https://script.googleusercontent.com/macros/echo?user_content_key=YOUR_CONTENT_KEY&lib=YOUR_LIB_ID
+```
+
+<Aside type="caution">
+**Important:** Use the `script.googleusercontent.com` URL format for better reliability. The system automatically handles redirects from `script.google.com`.
+</Aside>
+
+### Next.js Configuration
+
+The `next.config.js` is configured for static export:
+
+```javascript
+const nextConfig = {
+  output: 'export',          // Static HTML export
+  trailingSlash: true,       // Add trailing slashes
+  images: {
+    unoptimized: true        // Disable image optimization for static export
+  }
+}
+```
+
+For GitHub Pages subdirectory deployment, uncomment and configure:
+
+```javascript
+basePath: '/your-repo-name',
+assetPrefix: '/your-repo-name/',
+```
+
+---
+
+## Backend Setup
+
+### Google Sheets Architecture
+
+The backend uses a **three-sheet architecture** for optimal performance:
+
+<Tabs>
+<TabItem label="list_member">
+
+**Purpose**: Master members table for fast search operations
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `member_id` | String | Unique identifier (e.g., "001-2024-15684") |
+| `branch` | String | Branch location ("BSD" or "Kuningan") |
+| `name` | String | Member full name |
+| `birthdate` | Date | Birth date (YYYY-MM-DD) |
+| `parent_name` | String | Parent/guardian name |
+| `contact` | String | Phone number (normalized) |
+| `registration_status` | String | Current status (Active/Inactive) |
+
+</TabItem>
+<TabItem label="form">
+
+**Purpose**: Registration records (one row per token)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `member_id` | String | Reference to list_member |
+| `branch` | String | Branch location |
+| `name` | String | Member full name |
+| `birthdate` | Date | Birth date |
+| `activity_name` | String | Selected activity |
+| `parent_name` | String | Parent name |
+| `contact` | String | Phone number |
+| `token` | Number | Token number (1-5) |
+| `timestamp` | DateTime | Registration timestamp |
+
+</TabItem>
+<TabItem label="schedule">
+
+**Purpose**: Activity schedules and availability tracking
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `activity_id` | String | Unique activity identifier |
+| `branch` | String | Branch location |
+| `class_category` | String | Category (Tennis, Basketball, etc.) |
+| `activity_name` | String | Full activity description |
+| `total_slot` | Number | Maximum capacity |
+| `booked_slot` | Number | Currently booked |
+| `available_slot` | Number | Remaining slots |
+
+</TabItem>
+</Tabs>
+
+### Deployment Guide
+
+<Steps>
+
+1. **Create Google Sheets**
+   Set up three sheets (`list_member`, `form`, `schedule`) with exact column names
+
+2. **Open Apps Script Editor**
+   Extensions → Apps Script in your Google Sheet
+
+3. **Copy Backend Code**
+   Copy code from `gas-backend/Code.gs` to the editor
+
+4. **Configure Sheet IDs**
+   ```javascript
+   const CONFIG = {
+     bsd: {
+       FORM_SHEET_ID: 'YOUR_BSD_SHEET_ID_HERE',
+       SCHEDULE_SHEET_ID: 'YOUR_BSD_SHEET_ID_HERE',
+       LIST_MEMBER_SHEET_ID: 'YOUR_BSD_SHEET_ID_HERE',
+     },
+     kuningan: {
+       FORM_SHEET_ID: 'YOUR_KUNINGAN_SHEET_ID_HERE',
+       SCHEDULE_SHEET_ID: 'YOUR_KUNINGAN_SHEET_ID_HERE',
+       LIST_MEMBER_SHEET_ID: 'YOUR_KUNINGAN_SHEET_ID_HERE',
+     }
+   };
+   ```
+
+5. **Deploy as Web App**
+   - Click Deploy → New deployment
+   - Type: Web app
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+   - Click Deploy and authorize
+
+6. **Copy Web App URL**
+   Add the URL to your `.env.local` file
+
+</Steps>
+
+<Aside type="note">
+See `gas-backend/DEPLOYMENT.md` in the project folder for detailed backend setup instructions with screenshots.
+</Aside>
+
+---
+
+## API Integration
+
+### Endpoints
+
+The Google Apps Script backend provides these endpoints:
+
+#### 1. Health Check
+```http
+GET /exec
+Response: {"ok": true, "msg": "API ready"}
+```
+
+#### 2. Search Members
+```http
+GET /exec?fn=search&branch={branch}&phone={phone}
+Response: {"ok": true, "results": [...]}
+```
+
+#### 3. Load Schedules
+```http
+GET /exec?fn=schedules&branch={branch}
+Response: {"ok": true, "items": [...]}
+```
+
+#### 4. Submit Registration
+```http
+POST /exec
+Body: {"member": {...}, "selections": [...]}
+Response: {"ok": true}
+```
+
+<LinkCard
+  title="Complete API Documentation"
+  description="See docs/api-contract.md for detailed API specifications with request/response examples"
+  href="/projects/kyzn/term-form/docs/api-contract.md"
+/>
+
+---
+
+## Features Deep Dive
+
+### 1. Member Search
+
+**How It Works:**
+- User enters phone number and selects branch (BSD/Kuningan)
+- Automatic debounced search after 500ms of typing
+- Manual "Search" button for immediate retry
+- Results filtered by branch for data isolation
+
+**Technical Implementation:**
+- `useMemberSearch` hook with debouncing using `useRef`
+- AbortController for request cancellation
+- Phone number normalization (removes non-digits)
+- Minimum 9 digits validation
+
+### 2. Token Selection
+
+**Business Rules:**
+- Maximum 5 tokens total per registration
+- Maximum 2 tokens per category
+- No duplicate sessions (same `activity_id`)
+- Only sessions with `available_slot > 0` can be selected
+
+**Technical Implementation:**
+- `useSelections` hook manages sparse array (5 slots)
+- `setSelectionAtPosition` for token-specific updates
+- Real-time validation with category count tracking
+- Duplicate detection using `activity_id` comparison
+
+### 3. Real-Time Updates
+
+**Features:**
+- Toggle between Live (auto-refresh every 30s) and Manual mode
+- Manual refresh button for on-demand updates
+- Last updated timestamp display
+- Live indicator with animated pulse
+
+**Technical Implementation:**
+- `useSchedules` hook with `setInterval` for polling
+- Branch-aware schedule caching
+- Automatic cleanup on unmount
+- AbortController for request management
+
+### 4. Progress Tracking
+
+**Display:**
+- Total tokens used (e.g., "3/5 tokens")
+- Category breakdown with badges
+- Max reached indicators for categories at limit
+- Visual progress bar
+
+**Technical Implementation:**
+- `getCategoryCounts` returns category statistics
+- Dynamic badge colors (green for available, gray for maxed)
+- Real-time updates on selection changes
+
+---
+
+## Validation & Error Handling
+
+### Client-Side Validation
+
+```typescript
+// From page.tsx - Enhanced validation
+const isValidSelections = () => {
+  const validSelections = selections.filter(s => s !== null)
+  
+  // Check minimum and maximum
+  if (validSelections.length === 0) return false
+  if (validSelections.length > 5) return false
+  
+  // Validate required fields
+  for (const selection of validSelections) {
+    if (!selection.class_category || 
+        !selection.activity_id || 
+        !selection.activity_name) {
+      return false
+    }
+  }
+  
+  // Check category limits
+  const categoryCount = new Map()
+  for (const selection of validSelections) {
+    const count = (categoryCount.get(selection.class_category) || 0) + 1
+    if (count > 2) return false
+    categoryCount.set(selection.class_category, count)
+  }
+  
+  return true
+}
+```
+
+### Backend Validation
+
+The Google Apps Script backend performs:
+- Member data validation (required fields)
+- Selections array validation (min 1, max 5)
+- Category limit validation (max 2 per category)
+- Activity availability validation
+- Race condition prevention using LockService
+
+### Error Messages
+
+| Error Type | User Message | Action |
+|------------|-------------|--------|
+| Network Error | "Failed to connect to server" | Retry button appears |
+| Invalid Phone | No results returned | Try different number |
+| No Available Slots | "Session full" | Select different activity |
+| Category Maxed | Category grayed out | Choose different category |
+| Duplicate Session | Selection rejected silently | Choose different time |
+
+---
+
+## Deployment
+
+### Build for Production
+
+<Steps>
+
+1. **Verify environment**
+   Ensure `.env.local` has correct `NEXT_PUBLIC_APPS_SCRIPT_URL`
+
+2. **Build static export**
+   ```bash
+   npm run build
+   ```
+   This runs `next build` and creates `out/` directory
+
+3. **Test locally**
+   ```bash
+   npx serve out
+   ```
+   Visit `http://localhost:3000` to test
+
+</Steps>
+
+### Deploy to GitHub Pages
+
+<Tabs>
+<TabItem label="GitHub Actions">
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APPS_SCRIPT_URL: ${{ secrets.NEXT_PUBLIC_APPS_SCRIPT_URL }}
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+**Setup:**
+1. Add `NEXT_PUBLIC_APPS_SCRIPT_URL` to repository secrets
+2. Enable GitHub Pages in repository settings
+3. Push to main branch to trigger deployment
+
+</TabItem>
+<TabItem label="Manual Deploy">
+
+```bash
+# Install gh-pages
+npm install -D gh-pages
+
+# Add to package.json scripts
+"deploy": "gh-pages -d out"
+
+# Build and deploy
+npm run build
+npm run deploy
+```
+
+</TabItem>
+</Tabs>
+
+<Aside type="caution">
+**Subdirectory Deployment:** If deploying to `yourdomain.com/term-form`, update `next.config.js`:
+```javascript
+basePath: '/term-form',
+assetPrefix: '/term-form/'
+```
+</Aside>
+
+---
+
+## Testing
+
+### Manual Testing Checklist
+
+<Steps>
+
+1. **Backend Health Check**
+   ```bash
+   curl "YOUR_WEB_APP_URL"
+   ```
+   Expected: `{"ok":true,"msg":"API ready"}`
+
+2. **Member Search**
+   - Enter phone number
+   - Select branch
+   - Verify results display
+   - Test manual retry button
+
+3. **Token Selection**
+   - Select activities across different categories
+   - Verify category limits (max 2 per category)
+   - Try selecting duplicate session (should be prevented)
+   - Test clearing selections
+
+4. **Submission**
+   - Fill all 5 tokens
+   - Submit registration
+   - Verify success message
+   - Check Google Sheet for new records
+
+</Steps>
+
+### Backend Testing
+
+See `gas-backend/TESTING.md` for curl commands to test each endpoint:
+
+```bash
+# Search members
+curl "YOUR_URL?fn=search&branch=bsd&phone=081234567"
+
+# Load schedules  
+curl "YOUR_URL?fn=schedules&branch=bsd"
+
+# Submit registration
+curl -X POST "YOUR_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"member":{...},"selections":[...]}'
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+<Tabs>
+<TabItem label="Backend Connection">
+
+**Problem:** `net::ERR_ABORTED` errors
+
+**Solutions:**
+1. Verify backend URL is correct in `.env.local`
+2. Test backend directly: `curl YOUR_URL`
+3. Check Google Apps Script deployment:
+   - Deployed as Web App
+   - Access set to "Anyone"
+   - Using latest version
+4. Restart dev server after updating `.env.local`
+
+</TabItem>
+<TabItem label="Search Not Working">
+
+**Problem:** No search results
+
+**Solutions:**
+1. Verify `list_member` sheet has data
+2. Check phone number format (minimum 9 digits)
+3. Verify branch matches exactly ("BSD" or "Kuningan")
+4. Test search endpoint directly:
+   ```bash
+   curl "YOUR_URL?fn=search&branch=bsd&phone=081234567"
+   ```
+5. Use manual retry button
+
+</TabItem>
+<TabItem label="Selection Issues">
+
+**Problem:** Cannot select certain activities
+
+**Solutions:**
+1. Check if category limit reached (2/2)
+2. Verify activity has `available_slot > 0`
+3. Ensure activity isn't already selected in another token
+4. Refresh schedules to get latest availability
+5. Check browser console for validation errors
+
+</TabItem>
+<TabItem label="Submission Fails">
+
+**Problem:** Registration not submitting
+
+**Solutions:**
+1. Verify all required fields are filled
+2. Check that at least 1 token is selected
+3. Open browser DevTools → Network tab
+4. Check for backend errors in response
+5. Verify `form` sheet has write permissions
+6. Test submit endpoint:
+   ```bash
+   curl -X POST "YOUR_URL" \
+     -H "Content-Type: application/json" \
+     -d '{"member":{...},"selections":[...]}'
+   ```
+
+</TabItem>
+</Tabs>
+
+<LinkCard
+  title="Complete Troubleshooting Guide"
+  description="See gas-backend/TROUBLESHOOTING.md for detailed error codes and solutions"
+  href="/projects/kyzn/term-form/gas-backend/TROUBLESHOOTING.md"
+/>
+
+---
+
+## Browser Support
+
+| Browser | Minimum Version | Notes |
+|---------|----------------|-------|
+| Chrome | Latest | Full support |
+| Firefox | Latest | Full support |
+| Safari | 14+ | Full support |
+| Edge | Latest | Full support |
+| Mobile Safari (iOS) | 14+ | Touch optimized |
+| Chrome Mobile (Android) | 10+ | Touch optimized |
+
+**Requirements:**
+- JavaScript enabled
+- Cookies enabled (for session storage)
+- Modern ES2017+ support
+
+---
+
+## Performance
+
+### Frontend Optimization
+
+- **Code Splitting**: Automatic with Next.js App Router
+- **Static Export**: Pre-rendered HTML for fast initial load
+- **Debounced Search**: Reduces unnecessary API calls (500ms delay)
+- **Request Cancellation**: AbortController prevents race conditions
+- **Component Memoization**: Prevents unnecessary re-renders
+
+### Backend Optimization
+
+- **LockService**: Prevents race conditions on concurrent submissions
+- **Batch Operations**: Processes multiple tokens efficiently
+- **Schedule Caching**: Frontend caches for 60 seconds
+- **Branch Filtering**: Reduces data transfer size
+
+### Load Times
+
+- **First Load**: < 2 seconds (static HTML)
+- **Search**: < 500ms average
+- **Schedule Load**: < 1 second average
+- **Submission**: < 2 seconds average
+
+---
+
+## Security Considerations
+
+### Frontend
+
+- **Environment Variables**: API URL stored in `.env.local` (not committed)
+- **Input Sanitization**: Phone numbers normalized, trimmed
+- **Client-Side Validation**: Prevents invalid data submission
+- **HTTPS Only**: All API calls use secure connections
+
+### Backend
+
+- **Public Access**: Web App set to "Anyone" for public registration
+- **Rate Limiting**: 100 requests/minute per user (configurable)
+- **LockService**: Prevents concurrent modification issues
+- **Data Validation**: Comprehensive server-side validation
+- **Audit Trail**: Timestamps on all registrations
+
+<Aside type="caution">
+**Security Note:** This is a public registration system with no authentication. Member data is stored in Google Sheets accessible to the script owner. Ensure compliance with data protection regulations.
+</Aside>
+
+---
+
+## Additional Resources
+
+<CardGrid>
+  <Card title="API Documentation" icon="document">
+    Complete API contract with request/response examples  
+    → `docs/api-contract.md`
+  </Card>
+
+  <Card title="Backend Deployment" icon="rocket">
+    Step-by-step Google Apps Script setup guide  
+    → `gas-backend/DEPLOYMENT.md`
+  </Card>
+
+  <Card title="Testing Guide" icon="star">
+    Manual and automated testing procedures  
+    → `gas-backend/TESTING.md`
+  </Card>
+
+  <Card title="Troubleshooting" icon="warning">
+    Common issues and solutions  
+    → `gas-backend/TROUBLESHOOTING.md`
+  </Card>
+
+  <Card title="Integration Testing" icon="puzzle">
+    End-to-end testing scenarios  
+    → `docs/integration-testing.md`
+  </Card>
+
+  <Card title="QA Checklist" icon="approve-check">
+    Quality assurance checklist for production  
+    → `docs/qa-checklist.md`
+  </Card>
+</CardGrid>
+
+### External Documentation
+
+- [Next.js Documentation](https://nextjs.org/docs) - Framework reference
+- [shadcn/ui Components](https://ui.shadcn.com) - Component library docs
+- [Google Apps Script Guide](https://developers.google.com/apps-script) - Backend platform docs
+- [Tailwind CSS](https://tailwindcss.com/docs) - Styling framework
+
+---
+
+## License
+
+This project is for internal KYZN use. Contact the development team for licensing inquiries.
+
+---
+
+*Documentation last updated: January 2025*  
+*Project version: 0.1.0*

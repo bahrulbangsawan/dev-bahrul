@@ -1,0 +1,1112 @@
+---
+title: Install Dashboard Stack
+description: Step-by-step guide to install and configure the complete modern dashboard tech stack from scratch
+---
+
+import { Steps, Tabs, TabItem, Card, CardGrid, Aside, FileTree, Badge, LinkCard } from '@astrojs/starlight/components';
+
+A complete, beginner-friendly guide to install and configure the modern dashboard tech stack. This guide will take you from zero to a fully functional dashboard with React 19, Cloudflare Workers, Neon PostgreSQL, and more.
+
+<Aside type="tip" title="What You'll Build">
+By the end of this guide, you'll have:
+- ✅ Modern React 19 dashboard with TypeScript
+- ✅ Cloudflare Workers API backend
+- ✅ Neon PostgreSQL database with Drizzle ORM
+- ✅ shadcn/ui components with Tailwind CSS
+- ✅ Real-time capabilities with WebSocket
+- ✅ ClickHouse analytics (optional)
+- ✅ Complete authentication system
+</Aside>
+
+---
+
+## 📋 Prerequisites
+
+Before starting, ensure you have:
+
+<CardGrid>
+  <Card title="Computer" icon="laptop">
+    macOS, Windows, or Linux with admin access
+  </Card>
+
+  <Card title="Internet" icon="rocket">
+    Stable internet connection for downloads
+  </Card>
+
+  <Card title="Accounts" icon="star">
+    Free accounts: GitHub, Cloudflare, Neon (we'll create these)
+  </Card>
+
+  <Card title="Time" icon="setting">
+    ~45-60 minutes to complete full setup
+  </Card>
+</CardGrid>
+
+---
+
+## Part 1: Install Core Tools
+
+### Step 1: Install Bun
+
+**Bun** is our primary build tool and package manager - it's 4x faster than npm!
+
+<Steps>
+
+1. **Install Bun**
+
+   <Tabs>
+   <TabItem label="macOS/Linux">
+   ```bash
+   curl -fsSL https://bun.sh/install | bash
+   ```
+   </TabItem>
+   <TabItem label="Windows">
+   ```powershell
+   powershell -c "irm bun.sh/install.ps1 | iex"
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Verify Installation**
+   ```bash
+   bun --version
+   ```
+   You should see something like: `1.0.0` or higher
+
+3. **Restart Your Terminal**
+   Close and reopen your terminal to ensure `bun` is in your PATH
+
+</Steps>
+
+<Aside type="tip" title="Why Bun?">
+Bun is 4x faster than npm, includes a built-in test runner, and has native TypeScript support. Perfect for modern development!
+</Aside>
+
+### Step 2: Install Git
+
+Git is required for version control and some tools we'll use.
+
+<Tabs>
+<TabItem label="macOS">
+```bash
+# Using Homebrew (recommended)
+brew install git
+
+# Or use Xcode Command Line Tools
+xcode-select --install
+```
+</TabItem>
+<TabItem label="Windows">
+Download from [git-scm.com](https://git-scm.com/download/win) and run the installer.
+
+**Use default settings during installation.**
+</TabItem>
+<TabItem label="Linux">
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install git
+
+# Fedora
+sudo dnf install git
+```
+</TabItem>
+</Tabs>
+
+**Verify Git:**
+```bash
+git --version
+```
+
+### Step 3: Install VS Code (Recommended)
+
+While you can use any editor, VS Code has the best support for our stack.
+
+1. Download from [code.visualstudio.com](https://code.visualstudio.com/)
+2. Install the application
+3. Open VS Code
+
+**Install Recommended Extensions:**
+```bash
+# Open VS Code and install these extensions
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension esbenp.prettier-vscode
+code --install-extension bradlc.vscode-tailwindcss
+code --install-extension astro-build.astro-vscode
+```
+
+---
+
+## Part 2: Create Accounts
+
+### Step 1: GitHub Account
+
+<Steps>
+
+1. Visit [github.com/signup](https://github.com/signup)
+2. Create a free account
+3. Verify your email address
+4. Complete the profile setup
+
+</Steps>
+
+### Step 2: Cloudflare Account
+
+<Steps>
+
+1. Visit [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+2. Sign up with your email
+3. Verify your email
+4. Choose the **Free plan** (perfect for development)
+
+</Steps>
+
+### Step 3: Neon PostgreSQL Account
+
+<Steps>
+
+1. Visit [neon.tech](https://neon.tech)
+2. Click "Sign Up" and use GitHub to sign in (fastest)
+3. Create your first project:
+   - **Project name:** `my-dashboard-db`
+   - **Region:** Choose closest to you
+   - **PostgreSQL version:** 16 (default)
+4. Save your **connection string** - you'll need it later!
+
+</Steps>
+
+<Aside type="caution" title="Save Your Connection String">
+Copy the connection string that looks like:
+`postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname`
+
+Store it somewhere safe - we'll use it in Step 5!
+</Aside>
+
+---
+
+## Part 3: Create the Project
+
+### Step 1: Initialize React Project
+
+<Steps>
+
+1. **Open Terminal** in your projects folder
+
+2. **Create React Project with Vite**
+   ```bash
+   bun create vite my-dashboard --template react-ts
+   ```
+
+3. **Navigate to Project**
+   ```bash
+   cd my-dashboard
+   ```
+
+4. **Install Dependencies**
+   ```bash
+   bun install
+   ```
+
+5. **Test Development Server**
+   ```bash
+   bun run dev
+   ```
+   Visit `http://localhost:5173` - you should see the Vite + React page!
+
+6. **Stop the server** (Press `Ctrl+C`)
+
+</Steps>
+
+### Your Project Structure
+
+<FileTree>
+- my-dashboard/
+  - src/
+    - App.tsx
+    - main.tsx
+    - index.css
+  - public/
+  - package.json
+  - tsconfig.json
+  - vite.config.ts
+  - index.html
+</FileTree>
+
+---
+
+## Part 4: Install Frontend Dependencies
+
+### Step 1: Install Core Routing & Data
+
+```bash
+# Routing
+bun add @tanstack/react-router
+bun add -D @tanstack/router-vite-plugin
+
+# Data Fetching & State
+bun add @tanstack/react-query
+bun add zustand
+
+# Forms & Validation
+bun add react-hook-form zod @hookform/resolvers
+```
+
+<Aside type="note">
+These packages handle:
+- **TanStack Router** - Type-safe routing
+- **TanStack Query** - Server state management
+- **Zustand** - Client state management
+- **React Hook Form + Zod** - Forms with validation
+</Aside>
+
+### Step 2: Install UI Dependencies
+
+```bash
+# Tailwind CSS
+bun add -D tailwindcss postcss autoprefixer
+bunx tailwindcss init -p
+
+# shadcn/ui dependencies
+bun add tailwindcss-animate class-variance-authority clsx tailwind-merge
+bun add lucide-react
+```
+
+### Step 3: Install Data Visualization
+
+```bash
+# Charts & Tables
+bun add recharts @tremor/react
+bun add @tanstack/react-table
+```
+
+---
+
+## Part 5: Setup Tailwind CSS
+
+<Steps>
+
+1. **Update `tailwind.config.js`**
+   ```js title="tailwind.config.js"
+   /** @type {import('tailwindcss').Config} */
+   export default {
+     darkMode: ["class"],
+     content: [
+       './pages/**/*.{ts,tsx}',
+       './components/**/*.{ts,tsx}',
+       './app/**/*.{ts,tsx}',
+       './src/**/*.{ts,tsx}',
+     ],
+     theme: {
+       extend: {
+         colors: {
+           border: "hsl(var(--border))",
+           input: "hsl(var(--input))",
+           ring: "hsl(var(--ring))",
+           background: "hsl(var(--background))",
+           foreground: "hsl(var(--foreground))",
+           primary: {
+             DEFAULT: "hsl(var(--primary))",
+             foreground: "hsl(var(--primary-foreground))",
+           },
+           secondary: {
+             DEFAULT: "hsl(var(--secondary))",
+             foreground: "hsl(var(--secondary-foreground))",
+           },
+         },
+         borderRadius: {
+           lg: "var(--radius)",
+           md: "calc(var(--radius) - 2px)",
+           sm: "calc(var(--radius) - 4px)",
+         },
+       },
+     },
+     plugins: [require("tailwindcss-animate")],
+   }
+   ```
+
+2. **Update `src/index.css`**
+   ```css title="src/index.css"
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+
+   @layer base {
+     :root {
+       --background: 0 0% 100%;
+       --foreground: 222.2 84% 4.9%;
+       --primary: 222.2 47.4% 11.2%;
+       --primary-foreground: 210 40% 98%;
+       --secondary: 210 40% 96.1%;
+       --secondary-foreground: 222.2 47.4% 11.2%;
+       --border: 214.3 31.8% 91.4%;
+       --input: 214.3 31.8% 91.4%;
+       --ring: 222.2 84% 4.9%;
+       --radius: 0.5rem;
+     }
+
+     .dark {
+       --background: 222.2 84% 4.9%;
+       --foreground: 210 40% 98%;
+       --primary: 210 40% 98%;
+       --primary-foreground: 222.2 47.4% 11.2%;
+       --secondary: 217.2 32.6% 17.5%;
+       --secondary-foreground: 210 40% 98%;
+       --border: 217.2 32.6% 17.5%;
+       --input: 217.2 32.6% 17.5%;
+       --ring: 212.7 26.8% 83.9%;
+     }
+   }
+   ```
+
+</Steps>
+
+---
+
+## Part 6: Setup shadcn/ui Components
+
+<Steps>
+
+1. **Initialize shadcn/ui**
+   ```bash
+   bunx shadcn-ui@latest init
+   ```
+
+   Answer the prompts:
+   - **Style:** Default
+   - **Base color:** Slate
+   - **CSS variables:** Yes
+
+2. **Add Essential Components**
+   ```bash
+   bunx shadcn-ui@latest add button
+   bunx shadcn-ui@latest add card
+   bunx shadcn-ui@latest add input
+   bunx shadcn-ui@latest add label
+   bunx shadcn-ui@latest add table
+   bunx shadcn-ui@latest add dialog
+   bunx shadcn-ui@latest add dropdown-menu
+   ```
+
+</Steps>
+
+### Your Updated Structure
+
+<FileTree>
+- my-dashboard/
+  - src/
+    - components/
+      - ui/
+        - button.tsx
+        - card.tsx
+        - input.tsx
+        - label.tsx
+        - table.tsx
+    - lib/
+      - utils.ts
+    - App.tsx
+</FileTree>
+
+<Aside type="tip">
+You can add more components later with:
+`bunx shadcn-ui@latest add [component-name]`
+
+Browse components at [ui.shadcn.com](https://ui.shadcn.com)
+</Aside>
+
+---
+
+## Part 7: Setup Database (Drizzle + Neon)
+
+### Step 1: Install Database Dependencies
+
+```bash
+# Drizzle ORM
+bun add drizzle-orm @neondatabase/serverless
+bun add -D drizzle-kit
+```
+
+### Step 2: Create Drizzle Configuration
+
+<Steps>
+
+1. **Create `drizzle.config.ts` in project root**
+   ```ts title="drizzle.config.ts"
+   import type { Config } from 'drizzle-kit';
+
+   export default {
+     schema: './src/db/schema.ts',
+     out: './drizzle',
+     driver: 'pg',
+     dbCredentials: {
+       connectionString: process.env.DATABASE_URL!,
+     },
+   } satisfies Config;
+   ```
+
+2. **Create `.env` file in project root**
+   ```bash title=".env"
+   DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname
+   ```
+
+   <Aside type="caution">
+   Replace with YOUR connection string from Neon (Step 2, Part 2)
+   </Aside>
+
+3. **Add `.env` to `.gitignore`**
+   ```bash
+   echo ".env" >> .gitignore
+   ```
+
+</Steps>
+
+### Step 3: Create Database Schema
+
+<Steps>
+
+1. **Create folder structure**
+   ```bash
+   mkdir -p src/db
+   ```
+
+2. **Create `src/db/schema.ts`**
+   ```ts title="src/db/schema.ts"
+   import { pgTable, text, serial, timestamp } from 'drizzle-orm/pg-core';
+
+   export const users = pgTable('users', {
+     id: serial('id').primaryKey(),
+     name: text('name').notNull(),
+     email: text('email').notNull().unique(),
+     createdAt: timestamp('created_at').defaultNow(),
+   });
+
+   export const posts = pgTable('posts', {
+     id: serial('id').primaryKey(),
+     title: text('title').notNull(),
+     content: text('content'),
+     userId: serial('user_id').references(() => users.id),
+     createdAt: timestamp('created_at').defaultNow(),
+   });
+   ```
+
+3. **Generate Migration**
+   ```bash
+   bunx drizzle-kit generate:pg
+   ```
+
+4. **Push to Database**
+   ```bash
+   bunx drizzle-kit push:pg
+   ```
+
+</Steps>
+
+<Aside type="tip" title="Success!">
+Your database tables are now created in Neon PostgreSQL!
+You can view them in the Neon dashboard.
+</Aside>
+
+### Step 4: Create Database Client
+
+Create `src/db/client.ts`:
+
+```ts title="src/db/client.ts"
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
+import * as schema from './schema';
+
+const sql = neon(import.meta.env.VITE_DATABASE_URL!);
+export const db = drizzle(sql, { schema });
+```
+
+### Your Database Structure
+
+<FileTree>
+- my-dashboard/
+  - src/
+    - db/
+      - schema.ts
+      - client.ts
+  - drizzle/
+    - 0000_initial.sql
+  - drizzle.config.ts
+  - .env
+</FileTree>
+
+---
+
+## Part 8: Setup API Backend (Hono + Cloudflare Workers)
+
+### Step 1: Create API Project
+
+```bash
+# Create API folder
+mkdir api
+cd api
+
+# Initialize Hono project
+bun create hono my-api
+cd my-api
+
+# Install dependencies
+bun install
+```
+
+### Step 2: Install Backend Dependencies
+
+```bash
+# Add Better Auth for authentication
+bun add better-auth
+
+# Add database support
+bun add drizzle-orm @neondatabase/serverless
+
+# Add Cloudflare Workers support
+bun add -D wrangler
+```
+
+### Step 3: Create API Routes
+
+Create `src/index.ts`:
+
+```ts title="api/my-api/src/index.ts"
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+
+const app = new Hono()
+
+// Enable CORS for frontend
+app.use('/*', cors())
+
+// Health check
+app.get('/', (c) => {
+  return c.json({ message: 'Dashboard API' })
+})
+
+// Users endpoint
+app.get('/api/users', async (c) => {
+  // Database query will go here
+  return c.json({ users: [] })
+})
+
+// Posts endpoint
+app.get('/api/posts', async (c) => {
+  return c.json({ posts: [] })
+})
+
+export default app
+```
+
+### Step 4: Configure Wrangler
+
+Create `wrangler.toml`:
+
+```toml title="api/my-api/wrangler.toml"
+name = "my-dashboard-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-13"
+
+[vars]
+ENVIRONMENT = "production"
+```
+
+### Step 5: Test API Locally
+
+```bash
+bun run dev
+```
+
+Visit `http://localhost:8787` - you should see `{"message": "Dashboard API"}`!
+
+### Your API Structure
+
+<FileTree>
+- my-dashboard/
+  - api/
+    - my-api/
+      - src/
+        - index.ts
+      - wrangler.toml
+      - package.json
+  - src/
+</FileTree>
+
+---
+
+## Part 9: Connect Frontend to API
+
+### Step 1: Setup TanStack Query
+
+Create `src/lib/query-client.ts`:
+
+```ts title="src/lib/query-client.ts"
+import { QueryClient } from '@tanstack/react-query';
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 1,
+    },
+  },
+});
+```
+
+### Step 2: Update Main App
+
+Update `src/main.tsx`:
+
+```tsx title="src/main.tsx"
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/query-client'
+import App from './App.tsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </React.StrictMode>,
+)
+```
+
+### Step 3: Create API Client
+
+Create `src/lib/api.ts`:
+
+```ts title="src/lib/api.ts"
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+
+export async function fetchUsers() {
+  const res = await fetch(`${API_URL}/api/users`);
+  if (!res.ok) throw new Error('Failed to fetch users');
+  return res.json();
+}
+
+export async function fetchPosts() {
+  const res = await fetch(`${API_URL}/api/posts`);
+  if (!res.ok) throw new Error('Failed to fetch posts');
+  return res.json();
+}
+```
+
+### Step 4: Create a Dashboard Component
+
+Create `src/components/Dashboard.tsx`:
+
+```tsx title="src/components/Dashboard.tsx"
+import { useQuery } from '@tanstack/react-query';
+import { fetchUsers } from '../lib/api';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
+export function Dashboard() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Users</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{data?.users?.length || 0}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Projects</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">0</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">$0</p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+```
+
+### Step 5: Update App.tsx
+
+```tsx title="src/App.tsx"
+import { Dashboard } from './components/Dashboard'
+
+function App() {
+  return <Dashboard />
+}
+
+export default App
+```
+
+---
+
+## Part 10: Add Authentication (Better Auth)
+
+### Step 1: Install Better Auth
+
+```bash
+# In your API project
+cd api/my-api
+bun add better-auth
+```
+
+### Step 2: Configure Better Auth
+
+Create `src/lib/auth.ts`:
+
+```ts title="api/my-api/src/lib/auth.ts"
+import { betterAuth } from 'better-auth';
+
+export const auth = betterAuth({
+  database: {
+    provider: 'pg',
+    url: process.env.DATABASE_URL!,
+  },
+  emailAndPassword: {
+    enabled: true,
+  },
+});
+```
+
+### Step 3: Add Auth Routes to API
+
+Update `src/index.ts`:
+
+```ts title="api/my-api/src/index.ts"
+import { Hono } from 'hono'
+import { auth } from './lib/auth'
+
+const app = new Hono()
+
+// Mount auth routes
+app.use('/api/auth/*', async (c) => {
+  return auth.handler(c.req.raw)
+})
+
+// ... rest of your routes
+```
+
+---
+
+## Part 11: Deploy to Production
+
+### Step 1: Deploy API to Cloudflare Workers
+
+<Steps>
+
+1. **Login to Cloudflare**
+   ```bash
+   cd api/my-api
+   bunx wrangler login
+   ```
+
+2. **Add Environment Variables**
+   ```bash
+   bunx wrangler secret put DATABASE_URL
+   # Paste your Neon connection string
+   ```
+
+3. **Deploy**
+   ```bash
+   bunx wrangler deploy
+   ```
+
+4. **Save Your API URL**
+   Copy the URL from the output: `https://my-dashboard-api.YOUR-SUBDOMAIN.workers.dev`
+
+</Steps>
+
+### Step 2: Deploy Frontend to Cloudflare Pages
+
+<Steps>
+
+1. **Build Your Frontend**
+   ```bash
+   cd my-dashboard
+   bun run build
+   ```
+
+2. **Install Wrangler**
+   ```bash
+   bun add -D wrangler
+   ```
+
+3. **Deploy to Pages**
+   ```bash
+   bunx wrangler pages publish dist
+   ```
+
+4. **Your Dashboard is Live!**
+   You'll get a URL like: `https://my-dashboard.pages.dev`
+
+</Steps>
+
+---
+
+## Part 12: Optional Enhancements
+
+### Add ClickHouse Analytics (Optional)
+
+<Steps>
+
+1. **Sign up at [clickhouse.com/cloud](https://clickhouse.com/cloud)**
+
+2. **Install ClickHouse Client**
+   ```bash
+   bun add @clickhouse/client
+   ```
+
+3. **Create Analytics Schema**
+   ```sql
+   CREATE TABLE analytics.events (
+     event_name String,
+     user_id UInt64,
+     timestamp DateTime,
+     properties String
+   ) ENGINE = MergeTree()
+   ORDER BY (timestamp, event_name);
+   ```
+
+4. **Track Events in Your App**
+   ```ts
+   import { createClient } from '@clickhouse/client';
+
+   const client = createClient({
+     host: process.env.CLICKHOUSE_HOST,
+     password: process.env.CLICKHOUSE_PASSWORD,
+   });
+
+   await client.insert({
+     table: 'analytics.events',
+     values: [{
+       event_name: 'page_view',
+       user_id: 123,
+       timestamp: new Date(),
+       properties: JSON.stringify({ page: '/dashboard' })
+     }]
+   });
+   ```
+
+</Steps>
+
+### Add Sentry Monitoring (Optional)
+
+<Steps>
+
+1. **Sign up at [sentry.io](https://sentry.io)**
+
+2. **Install Sentry**
+   ```bash
+   bun add @sentry/react
+   ```
+
+3. **Initialize Sentry**
+   ```tsx title="src/main.tsx"
+   import * as Sentry from "@sentry/react";
+
+   Sentry.init({
+     dsn: "YOUR_SENTRY_DSN",
+     environment: "production",
+   });
+   ```
+
+</Steps>
+
+---
+
+## 🎯 Verification Checklist
+
+Make sure everything works:
+
+<Steps>
+
+1. **Frontend Development Server**
+   ```bash
+   cd my-dashboard
+   bun run dev
+   ```
+   ✅ Opens at `http://localhost:5173`
+
+2. **API Development Server**
+   ```bash
+   cd api/my-api
+   bun run dev
+   ```
+   ✅ Opens at `http://localhost:8787`
+
+3. **Database Connection**
+   ✅ Can query Neon database
+   ✅ Tables exist in Neon dashboard
+
+4. **UI Components**
+   ✅ shadcn/ui components render correctly
+   ✅ Tailwind CSS styles applied
+   ✅ Dark mode works
+
+5. **Production Deployment**
+   ✅ API deployed to Cloudflare Workers
+   ✅ Frontend deployed to Cloudflare Pages
+   ✅ Environment variables configured
+
+</Steps>
+
+---
+
+## 📁 Final Project Structure
+
+<FileTree>
+- my-dashboard/
+  - api/
+    - my-api/
+      - src/
+        - lib/
+          - auth.ts
+        - index.ts
+      - wrangler.toml
+      - package.json
+  - src/
+    - components/
+      - ui/
+        - button.tsx
+        - card.tsx
+        - input.tsx
+      - Dashboard.tsx
+    - db/
+      - schema.ts
+      - client.ts
+    - lib/
+      - api.ts
+      - query-client.ts
+      - utils.ts
+    - App.tsx
+    - main.tsx
+    - index.css
+  - drizzle/
+    - 0000_initial.sql
+  - public/
+  - .env
+  - drizzle.config.ts
+  - tailwind.config.js
+  - tsconfig.json
+  - vite.config.ts
+  - package.json
+</FileTree>
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: "Module not found" errors
+
+<Aside type="tip">
+**Solution:** Install missing dependencies
+```bash
+bun install
+```
+</Aside>
+
+### Issue: Database connection fails
+
+<Aside type="caution">
+**Solution:** Check your `.env` file
+1. Verify `DATABASE_URL` is correct
+2. Ensure no trailing spaces
+3. Test connection in Neon dashboard
+</Aside>
+
+### Issue: Tailwind styles not applying
+
+<Aside type="tip">
+**Solution:** Verify Tailwind config
+1. Check `tailwind.config.js` content paths
+2. Ensure `@tailwind` directives in `index.css`
+3. Restart dev server
+</Aside>
+
+### Issue: API CORS errors
+
+<Aside type="tip">
+**Solution:** Enable CORS in API
+```ts
+import { cors } from 'hono/cors'
+app.use('/*', cors())
+```
+</Aside>
+
+---
+
+## 📚 Next Steps
+
+Now that your dashboard is set up, you can:
+
+<CardGrid>
+  <LinkCard
+    title="Add More Components"
+    description="Browse shadcn/ui components and add what you need"
+    href="https://ui.shadcn.com"
+  />
+
+  <LinkCard
+    title="Learn TanStack Router"
+    description="Add multi-page routing to your dashboard"
+    href="https://tanstack.com/router"
+  />
+
+  <LinkCard
+    title="Customize Design"
+    description="Modify Tailwind theme colors and styles"
+    href="https://tailwindcss.com/docs"
+  />
+
+  <LinkCard
+    title="Add Charts"
+    description="Implement Recharts for data visualization"
+    href="https://recharts.org"
+  />
+</CardGrid>
+
+---
+
+## 🎉 Congratulations!
+
+You've successfully installed and configured:
+
+✅ **Frontend:** React 19 + TypeScript + Tailwind CSS + shadcn/ui
+✅ **Backend:** Hono API on Cloudflare Workers
+✅ **Database:** Neon PostgreSQL with Drizzle ORM
+✅ **State Management:** TanStack Query + Zustand
+✅ **Authentication:** Better Auth
+✅ **Deployment:** Cloudflare Workers + Pages
+
+Your dashboard is production-ready! 🚀
+
+<Aside type="tip" title="Need Help?">
+Join the communities:
+- [Cloudflare Discord](https://discord.gg/cloudflaredev)
+- [Neon Community](https://neon.tech/community)
+- [shadcn/ui GitHub](https://github.com/shadcn/ui)
+</Aside>
+
+---
+
+*Last updated: October 2025*

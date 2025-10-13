@@ -1,0 +1,1057 @@
+---
+title: Learn MCP Server
+description: Complete guide to installing and configuring Model Context Protocol (MCP) servers for Claude Code, Zed, and Visual Studio Code
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { FileTree } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { LinkCard } from '@astrojs/starlight/components';
+
+A comprehensive guide to installing and configuring **Model Context Protocol (MCP)** servers for Claude Code, Zed, and Visual Studio Code. MCP servers provide AI assistants with access to external tools, APIs, and documentation.
+
+## What is MCP?
+
+**Model Context Protocol (MCP)** is an open protocol that enables AI assistants to:
+- Access external APIs and services
+- Query documentation in real-time
+- Interact with development tools
+- Extend capabilities beyond basic code editing
+
+### Benefits of MCP Servers
+
+<Aside type="tip">
+- **Real-time Documentation** - Access latest docs from Astro, React, etc.
+- **Tool Integration** - Connect to Sentry, Neon, and other services
+- **Enhanced Context** - AI understands your tools and stack
+- **Productivity Boost** - Less context switching, more coding
+</Aside>
+
+---
+
+## Prerequisites
+
+Before installing MCP servers, ensure you have:
+
+- **Node.js 18+** or **Bun** installed
+- **Claude Code**, **Zed**, or **VS Code** installed
+- Basic command line knowledge
+- API keys for services you want to use <Badge text="optional" variant="note" />
+
+### Check Your Environment
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+# Check Bun version
+bun --version   # Any recent version
+```
+</TabItem>
+<TabItem label="Node.js">
+```bash
+# Check Node.js version
+node --version  # Should be v18.0.0 or higher
+
+# Check npm
+npm --version
+```
+</TabItem>
+</Tabs>
+
+---
+
+## Installation Methods
+
+MCP servers can be installed in two ways:
+
+### 1. HTTP-based MCP Servers
+- Hosted remotely
+- No local installation required
+- Just add URL to config
+- Examples: Sentry, Astro Docs, Exa, Neon
+
+### 2. Command-based MCP Servers
+- Run locally via npm/npx
+- More control and customization
+- Examples: shadcn, custom servers
+
+---
+
+## Installation by Editor
+
+## Claude Code
+
+### Configuration File Location
+
+Claude Code stores MCP configuration in:
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+~/.config/claude/claude_desktop_config.json
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+%APPDATA%\Claude\claude_desktop_config.json
+```
+</TabItem>
+</Tabs>
+
+<Steps>
+1. **Create Configuration File**
+
+   If the file doesn't exist, create it:
+
+   <Tabs>
+   <TabItem label="macOS/Linux">
+   ```bash
+   mkdir -p ~/.config/claude
+   touch ~/.config/claude/claude_desktop_config.json
+   ```
+   </TabItem>
+   <TabItem label="Windows (PowerShell)">
+   ```powershell
+   New-Item -Path "$env:APPDATA\Claude" -ItemType Directory -Force
+   New-Item -Path "$env:APPDATA\Claude\claude_desktop_config.json" -ItemType File
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Add MCP Server Configuration**
+
+   Open the configuration file and add:
+
+   ```json title="claude_desktop_config.json"
+   {
+     "mcpServers": {
+       "sentry": {
+         "type": "http",
+         "url": "https://mcp.sentry.dev/mcp"
+       },
+       "astro-docs": {
+         "type": "http",
+         "url": "https://mcp.docs.astro.build/mcp"
+       },
+       "exa": {
+         "type": "http",
+         "url": "https://mcp.exa.ai/mcp",
+         "headers": {}
+       },
+       "neon": {
+         "type": "http",
+         "url": "https://mcp.neon.tech/mcp"
+       },
+       "shadcn": {
+         "command": "npx",
+         "args": [
+           "shadcn@latest",
+           "mcp"
+         ]
+       }
+     }
+   }
+   ```
+
+3. **Add API Keys** <Badge text="Optional" variant="note" />
+
+   Some MCP servers require authentication. Add headers:
+
+   ```json title="claude_desktop_config.json"
+   {
+     "mcpServers": {
+       "exa": {
+         "type": "http",
+         "url": "https://mcp.exa.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer YOUR_EXA_API_KEY"
+         }
+       },
+       "neon": {
+         "type": "http",
+         "url": "https://mcp.neon.tech/mcp",
+         "headers": {
+           "Authorization": "Bearer YOUR_NEON_API_KEY"
+         }
+       }
+     }
+   }
+   ```
+
+4. **Restart Claude Code**
+
+   <Tabs>
+   <TabItem label="macOS">
+   ```bash
+   # Quit Claude Code completely (Cmd+Q)
+   # Then relaunch from Applications
+   ```
+   </TabItem>
+   <TabItem label="Linux">
+   ```bash
+   pkill claude-code
+   claude-code
+   ```
+   </TabItem>
+   <TabItem label="Windows">
+   ```
+   # Close Claude Code completely
+   # Then restart from Start Menu
+   ```
+   </TabItem>
+   </Tabs>
+
+5. **Verify Installation**
+
+   1. Open Claude Code
+   2. Start a new conversation
+   3. Type: "Can you access Astro documentation?"
+   4. Claude should respond with access to Astro docs
+
+</Steps>
+
+---
+
+## Zed Editor
+
+### Configuration File Location
+
+Zed stores MCP configuration in:
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+~/.config/zed/settings.json
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+%APPDATA%\Zed\settings.json
+```
+</TabItem>
+</Tabs>
+
+<Steps>
+1. **Open Zed Settings**
+
+   <Tabs>
+   <TabItem label="Command Palette">
+   ```
+   Cmd+Shift+P (macOS) or Ctrl+Shift+P (Windows/Linux)
+   Type: "zed: open settings"
+   ```
+   </TabItem>
+   <TabItem label="Menu">
+   ```
+   Zed > Settings > Open Settings (JSON)
+   ```
+   </TabItem>
+   <TabItem label="Keyboard Shortcut">
+   ```
+   Cmd+, (macOS) or Ctrl+, (Windows/Linux)
+   Click "Open settings.json" at bottom
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Add MCP Configuration**
+
+   Add or merge this into your `settings.json`:
+
+   ```json title="settings.json"
+   {
+     "assistant": {
+       "version": "2",
+       "provider": {
+         "name": "anthropic",
+         "default_model": {
+           "model": "claude-3-5-sonnet-20241022"
+         }
+       }
+     },
+     "context_servers": {
+       "sentry": {
+         "type": "http",
+         "url": "https://mcp.sentry.dev/mcp"
+       },
+       "astro-docs": {
+         "type": "http",
+         "url": "https://mcp.docs.astro.build/mcp"
+       },
+       "exa": {
+         "type": "http",
+         "url": "https://mcp.exa.ai/mcp",
+         "headers": {}
+       },
+       "neon": {
+         "type": "http",
+         "url": "https://mcp.neon.tech/mcp"
+       },
+       "shadcn": {
+         "command": "npx",
+         "args": [
+           "shadcn@latest",
+           "mcp"
+         ]
+       }
+     }
+   }
+   ```
+
+3. **Add API Keys** <Badge text="Optional" variant="note" />
+
+   ```json title="settings.json"
+   {
+     "context_servers": {
+       "exa": {
+         "type": "http",
+         "url": "https://mcp.exa.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer YOUR_EXA_API_KEY"
+         }
+       }
+     }
+   }
+   ```
+
+4. **Reload Zed**
+
+   <Tabs>
+   <TabItem label="Command Palette">
+   ```
+   Cmd+Shift+P (macOS) or Ctrl+Shift+P (Windows/Linux)
+   Type: "zed: reload"
+   ```
+   </TabItem>
+   <TabItem label="Restart">
+   Completely close and restart Zed
+   </TabItem>
+   </Tabs>
+
+5. **Verify Installation**
+
+   1. Open Zed Assistant (Cmd+Shift+A or Ctrl+Shift+A)
+   2. Ask: "Can you search the Astro documentation?"
+   3. Assistant should confirm access to MCP servers
+
+</Steps>
+
+---
+
+## Visual Studio Code
+
+### Configuration with Continue Extension
+
+VS Code uses MCP through the **Continue** extension.
+
+<Steps>
+1. **Install Continue Extension**
+
+   <Tabs>
+   <TabItem label="VS Code Marketplace">
+   1. Open VS Code
+   2. Click Extensions icon (Cmd+Shift+X)
+   3. Search "Continue"
+   4. Click "Install" on "Continue - AI Code Assistant"
+   </TabItem>
+   <TabItem label="Command Line">
+   ```bash
+   code --install-extension continue.continue
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Configuration File Location**
+
+   Continue stores config in:
+
+   <Tabs>
+   <TabItem label="macOS/Linux">
+   ```bash
+   ~/.continue/config.json
+   ```
+   </TabItem>
+   <TabItem label="Windows">
+   ```bash
+   %USERPROFILE%\.continue\config.json
+   ```
+   </TabItem>
+   </Tabs>
+
+3. **Create/Edit Configuration**
+
+   Open the config file:
+
+   <Tabs>
+   <TabItem label="Command Palette">
+   ```
+   Cmd+Shift+P (macOS) or Ctrl+Shift+P (Windows/Linux)
+   Type: "Continue: Open Config"
+   ```
+   </TabItem>
+   <TabItem label="Manual (macOS/Linux)">
+   ```bash
+   code ~/.continue/config.json
+   ```
+   </TabItem>
+   <TabItem label="Manual (Windows)">
+   ```bash
+   code %USERPROFILE%\.continue\config.json
+   ```
+   </TabItem>
+   </Tabs>
+
+4. **Add MCP Configuration**
+
+   Add to your `config.json`:
+
+   ```json title="config.json"
+   {
+     "models": [
+       {
+         "title": "Claude 3.5 Sonnet",
+         "provider": "anthropic",
+         "model": "claude-3-5-sonnet-20241022",
+         "apiKey": "YOUR_ANTHROPIC_API_KEY"
+       }
+     ],
+     "contextProviders": [
+       {
+         "name": "mcp",
+         "params": {
+           "servers": {
+             "sentry": {
+               "type": "http",
+               "url": "https://mcp.sentry.dev/mcp"
+             },
+             "astro-docs": {
+               "type": "http",
+               "url": "https://mcp.docs.astro.build/mcp"
+             },
+             "exa": {
+               "type": "http",
+               "url": "https://mcp.exa.ai/mcp",
+               "headers": {}
+             },
+             "neon": {
+               "type": "http",
+               "url": "https://mcp.neon.tech/mcp"
+             },
+             "shadcn": {
+               "command": "npx",
+               "args": [
+                 "shadcn@latest",
+                 "mcp"
+               ]
+             }
+           }
+         }
+       }
+     ]
+   }
+   ```
+
+5. **Reload VS Code Window**
+
+   ```
+   Cmd+Shift+P (macOS) or Ctrl+Shift+P (Windows/Linux)
+   Type: "Developer: Reload Window"
+   ```
+
+6. **Verify Installation**
+
+   1. Open Continue chat (Cmd+Shift+L or Ctrl+Shift+L)
+   2. Type: "@mcp Can you access Astro docs?"
+   3. Continue should respond with MCP access
+
+</Steps>
+
+---
+
+## Recommended MCP Servers
+
+### 1. Sentry MCP Server
+
+**Purpose:** Error tracking and monitoring integration
+
+**Features:**
+- Query error logs
+- Check issue status
+- Get performance metrics
+- Access release information
+
+```json title="Configuration"
+{
+  "sentry": {
+    "type": "http",
+    "url": "https://mcp.sentry.dev/mcp"
+  }
+}
+```
+
+**Use Cases:**
+- "Show me recent errors in production"
+- "What's the error rate for the last deployment?"
+- "Get details about error ID 123456"
+
+<Badge text="API Key Required" variant="caution" /> No (for public data), Yes (for private projects)
+
+---
+
+### 2. Astro Docs MCP Server
+
+**Purpose:** Real-time access to Astro documentation
+
+**Features:**
+- Search Astro documentation
+- Get latest API references
+- Access guides and tutorials
+- Query best practices
+
+```json title="Configuration"
+{
+  "astro-docs": {
+    "type": "http",
+    "url": "https://mcp.docs.astro.build/mcp"
+  }
+}
+```
+
+**Use Cases:**
+- "How do I configure Astro for Cloudflare?"
+- "What are the latest Astro 5 features?"
+- "Show me Astro routing examples"
+
+<Badge text="API Key Required" variant="success" /> No
+
+---
+
+### 3. Exa Search MCP Server
+
+**Purpose:** AI-powered web search for developers
+
+**Features:**
+- Semantic code search
+- Find technical documentation
+- Discover libraries and tools
+- Search GitHub repositories
+
+```json title="Configuration"
+{
+  "exa": {
+    "type": "http",
+    "url": "https://mcp.exa.ai/mcp",
+    "headers": {
+      "Authorization": "Bearer YOUR_EXA_API_KEY"
+    }
+  }
+}
+```
+
+**Use Cases:**
+- "Find React component libraries for dashboards"
+- "Search for Tailwind CSS animation examples"
+- "What are the best practices for Drizzle ORM?"
+
+<Badge text="API Key Required" variant="danger" /> Yes  
+**Get API Key:** [https://exa.ai](https://exa.ai)
+
+---
+
+### 4. Neon MCP Server
+
+**Purpose:** PostgreSQL database management
+
+**Features:**
+- Query database schema
+- Run SQL queries
+- Manage database branches
+- Monitor connection pools
+
+```json title="Configuration"
+{
+  "neon": {
+    "type": "http",
+    "url": "https://mcp.neon.tech/mcp",
+    "headers": {
+      "Authorization": "Bearer YOUR_NEON_API_KEY"
+    }
+  }
+}
+```
+
+**Use Cases:**
+- "Show me the schema for the users table"
+- "Create a new database branch for testing"
+- "What are the current connection pool stats?"
+
+<Badge text="API Key Required" variant="danger" /> Yes  
+**Get API Key:** [https://neon.tech/dashboard](https://neon.tech/dashboard) > API Keys
+
+---
+
+### 5. shadcn MCP Server
+
+**Purpose:** shadcn/ui component CLI integration
+
+**Features:**
+- Browse available components
+- Get component installation commands
+- Access component documentation
+- Check component dependencies
+
+```json title="Configuration"
+{
+  "shadcn": {
+    "command": "npx",
+    "args": [
+      "shadcn@latest",
+      "mcp"
+    ]
+  }
+}
+```
+
+**Use Cases:**
+- "How do I add the dialog component?"
+- "What shadcn components are available?"
+- "Show me the button component documentation"
+
+<Badge text="API Key Required" variant="success" /> No
+
+<Aside type="note">
+Requires `npx` and internet connection
+</Aside>
+
+---
+
+## Getting API Keys
+
+### Exa API Key
+
+<Steps>
+1. Visit [https://exa.ai](https://exa.ai)
+2. Click "Sign Up" or "Get API Key"
+3. Create account (GitHub sign-in available)
+4. Navigate to Dashboard > API Keys
+5. Click "Create New API Key"
+6. Copy the key (starts with `exa_`)
+
+</Steps>
+
+<Badge text="Free Tier" variant="success" /> 1,000 requests/month
+
+### Neon API Key
+
+<Steps>
+1. Visit [https://neon.tech](https://neon.tech)
+2. Sign in to your account
+3. Go to Account Settings > API Keys
+4. Click "Create API Key"
+5. Give it a name (e.g., "MCP Server")
+6. Copy the key
+
+</Steps>
+
+<Badge text="Free Tier" variant="success" /> 10 GB storage, 100 hours compute/month
+
+### Sentry API Key <Badge text="Optional" variant="note" />
+
+<Steps>
+1. Visit [https://sentry.io](https://sentry.io)
+2. Sign in to your organization
+3. Go to Settings > Developer Settings > Auth Tokens
+4. Click "Create New Token"
+5. Select scopes: `project:read`, `event:read`
+6. Copy the token
+
+</Steps>
+
+<Badge text="Free Tier" variant="success" /> 5,000 events/month
+
+---
+
+## Advanced Configuration
+
+### Environment Variables for API Keys
+
+Instead of hardcoding API keys, use environment variables:
+
+#### Claude Code
+
+```json title="claude_desktop_config.json"
+{
+  "mcpServers": {
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${EXA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+Set environment variables:
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+export EXA_API_KEY="your_key_here"
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+# System Environment Variables
+setx EXA_API_KEY "your_key_here"
+```
+</TabItem>
+</Tabs>
+
+#### Zed Editor
+
+Zed automatically reads from environment variables:
+
+```json title="settings.json"
+{
+  "context_servers": {
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${EXA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+#### VS Code (Continue)
+
+Use `.env` file in your project:
+
+```env title=".env"
+# .env
+EXA_API_KEY=your_key_here
+NEON_API_KEY=your_key_here
+```
+
+Reference in `config.json`:
+
+```json title="config.json"
+{
+  "contextProviders": [
+    {
+      "name": "mcp",
+      "params": {
+        "servers": {
+          "exa": {
+            "headers": {
+              "Authorization": "Bearer ${EXA_API_KEY}"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+---
+
+## Troubleshooting
+
+### Issue: MCP Server Not Working
+
+<Aside type="caution" title="Symptoms">
+- AI assistant doesn't recognize MCP commands
+- "MCP server not found" errors
+- No response from MCP queries
+</Aside>
+
+<Aside type="tip" title="Solutions">
+
+**1. Check Configuration File Syntax**
+```bash
+# Validate JSON syntax
+cat ~/.config/claude/claude_desktop_config.json | jq .
+```
+
+**2. Verify Server URLs**
+```bash
+# Test HTTP MCP servers
+curl -I https://mcp.docs.astro.build/mcp
+# Should return 200 OK
+```
+
+**3. Check API Keys**
+```bash
+# Test with curl
+curl -H "Authorization: Bearer YOUR_API_KEY" https://mcp.exa.ai/mcp
+```
+
+**4. Restart Editor Completely**
+Fully quit and restart (not just reload)
+
+</Aside>
+
+### Issue: Command-based MCP Fails
+
+<Aside type="caution" title="Symptoms">
+- `shadcn` MCP server not responding
+- "Command not found" errors
+</Aside>
+
+<Aside type="tip" title="Solutions">
+
+**1. Check Node.js/npm Installation**
+```bash
+node --version
+npm --version
+npx --version
+```
+
+**2. Test Command Manually**
+```bash
+npx shadcn@latest mcp
+# Should show MCP server output
+```
+
+**3. Update npm/npx**
+```bash
+npm install -g npm@latest
+```
+
+</Aside>
+
+### Issue: Slow MCP Response
+
+<Aside type="caution" title="Symptoms">
+- Long wait times for MCP queries
+- Timeouts
+</Aside>
+
+<Aside type="tip" title="Solutions">
+1. **Check Network Connection**
+2. **Verify Server Status** - Check service status pages
+3. **Use Local MCP Servers** - Host your own for better performance
+</Aside>
+
+---
+
+## MCP Servers Comparison
+
+| Server | Type | API Key | Free Tier | Best For |
+|--------|------|---------|-----------|----------|
+| **Sentry** | HTTP | Optional | 5k events/mo | Error tracking |
+| **Astro Docs** | HTTP | No | Unlimited | Astro development |
+| **Exa** | HTTP | Yes | 1k searches/mo | Code search |
+| **Neon** | HTTP | Yes | 10GB/100hrs | Database queries |
+| **shadcn** | Command | No | Unlimited | UI components |
+
+---
+
+## Best Practices
+
+<Aside type="tip" title="Best Practices">
+
+### 1. Use Environment Variables for API Keys
+```bash
+# Never commit API keys to git
+echo "*.env" >> .gitignore
+```
+
+### 2. Start with HTTP-based Servers
+- Easier to configure
+- No local dependencies
+- Faster to troubleshoot
+
+### 3. Enable Only Needed Servers
+```json
+// Don't add servers you don't use
+// Reduces startup time and API calls
+{
+  "mcpServers": {
+    "astro-docs": { /* only if using Astro */ }
+  }
+}
+```
+
+### 4. Monitor API Usage
+- Check dashboard for rate limits
+- Upgrade plan if needed
+- Use caching when possible
+
+### 5. Keep Configuration Backed Up
+```bash
+# Backup your config
+cp ~/.config/claude/claude_desktop_config.json ~/backup/
+```
+
+</Aside>
+
+---
+
+## Next Steps
+
+After installing MCP servers:
+
+<Steps>
+1. **Test Each Server**
+   - Ask AI to query each MCP server
+   - Verify responses are accurate
+
+2. **Explore Capabilities**
+   - Try different queries
+   - Learn what each server can do
+
+3. **Integrate into Workflow**
+   - Use MCP servers in daily coding
+   - Create custom workflows
+
+4. **Build Custom MCP Servers**
+   - Learn MCP protocol
+   - Create server for your tools
+
+</Steps>
+
+---
+
+## Additional Resources
+
+### Official Documentation
+
+<LinkCard
+  title="MCP Specification"
+  description="Learn about the Model Context Protocol"
+  href="https://modelcontextprotocol.io"
+/>
+
+<LinkCard
+  title="Claude Code MCP Guide"
+  description="Official Claude Code documentation"
+  href="https://docs.anthropic.com/claude/docs/mcp"
+/>
+
+<LinkCard
+  title="Zed MCP Documentation"
+  description="Context servers in Zed editor"
+  href="https://zed.dev/docs/context-servers"
+/>
+
+<LinkCard
+  title="Continue Extension Docs"
+  description="VS Code AI assistant documentation"
+  href="https://continue.dev/docs"
+/>
+
+### MCP Server Directories
+
+<LinkCard
+  title="Official MCP Servers"
+  description="Collection of official MCP server implementations"
+  href="https://github.com/modelcontextprotocol/servers"
+/>
+
+<LinkCard
+  title="Awesome MCP Servers"
+  description="Curated list of community MCP servers"
+  href="https://github.com/punkpeye/awesome-mcp-servers"
+/>
+
+### Tutorials
+
+<LinkCard
+  title="Building Custom MCP Servers"
+  description="Learn to create your own MCP servers"
+  href="https://modelcontextprotocol.io/docs/building-servers"
+/>
+
+<LinkCard
+  title="MCP Best Practices"
+  description="Recommended patterns and practices"
+  href="https://modelcontextprotocol.io/docs/best-practices"
+/>
+
+---
+
+## Quick Reference
+
+### Claude Code Config Location
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+~/.config/claude/claude_desktop_config.json
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+%APPDATA%\Claude\claude_desktop_config.json
+```
+</TabItem>
+</Tabs>
+
+### Zed Config Location
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+~/.config/zed/settings.json
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+%APPDATA%\Zed\settings.json
+```
+</TabItem>
+</Tabs>
+
+### VS Code (Continue) Config Location
+
+<Tabs>
+<TabItem label="macOS/Linux">
+```bash
+~/.continue/config.json
+```
+</TabItem>
+<TabItem label="Windows">
+```bash
+%USERPROFILE%\.continue\config.json
+```
+</TabItem>
+</Tabs>
+
+### Minimal Working Configuration
+
+```json title="Minimal config"
+{
+  "mcpServers": {
+    "astro-docs": {
+      "type": "http",
+      "url": "https://mcp.docs.astro.build/mcp"
+    }
+  }
+}
+```
+
+---
+
+## Conclusion
+
+You now have MCP servers configured for your AI coding assistant! This enables:
+
+- **Real-time documentation access**
+- **External tool integration**
+- **Enhanced AI capabilities**
+- **More productive coding**
+
+<Aside type="tip">
+Start by asking your AI assistant to query the MCP servers and explore their capabilities!
+</Aside>
+
+Happy coding with MCP!

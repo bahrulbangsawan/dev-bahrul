@@ -1,0 +1,963 @@
+---
+title: Astro + Cloudflare
+description: Complete step-by-step guide to deploy Astro projects to Cloudflare Workers
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { FileTree } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { LinkCard } from '@astrojs/starlight/components';
+
+This guide will walk you through deploying an Astro project to Cloudflare Workers from scratch. Perfect for beginners!
+
+## Prerequisites
+
+Before starting, make sure you have:
+
+- **Node.js** (v18 or higher) or **Bun** installed
+- A **Cloudflare account** (free tier works fine)
+- Basic terminal/command line knowledge
+
+---
+
+## Project Folder Structure
+
+Understanding where files go is crucial! Here's the complete folder structure of an Astro + Cloudflare project:
+
+<FileTree>
+- my-astro-site/ Your project folder (root)
+  - src/ Source code (you work here)
+    - pages/ Your website pages
+      - index.astro Homepage (/)
+    - components/ Reusable components
+    - layouts/ Page layouts
+    - styles/ CSS files
+  - public/ Static files (images, fonts, etc.)
+    - favicon.svg Site icon
+  - dist/ Built files (auto-generated)
+    - _worker.js Cloudflare Worker script
+    - .assetsignore Ignore file for Wrangler
+  - node_modules/ Dependencies (auto-installed)
+  - astro.config.mjs <Badge text="Root" variant="note" /> Astro configuration
+  - wrangler.jsonc <Badge text="Root" variant="note" /> Cloudflare config
+  - package.json <Badge text="Root" variant="note" /> Project info & scripts
+  - tsconfig.json TypeScript config
+  - .gitignore Git ignore file
+</FileTree>
+
+### Important Locations
+
+| File/Folder | Location | Purpose |
+|------------|----------|---------|
+| `astro.config.mjs` | **Root** | Astro + Cloudflare adapter config |
+| `wrangler.jsonc` | **Root** | Cloudflare deployment settings |
+| `package.json` | **Root** | Dependencies and scripts |
+| `.assetsignore` | **dist/** | Tells Wrangler what to ignore |
+| `.dev.vars` | **Root** | Local environment variables |
+| Your pages | **src/pages/** | Website pages you create |
+| Static assets | **public/** | Images, fonts (copied as-is) |
+
+<Aside type="tip" title="Key Points">
+1. **Root files** = Same level as `package.json`
+2. **Source files** = Inside `src/` folder
+3. **Built files** = Auto-generated in `dist/` (don't edit!)
+4. **Config files** = Always in the root
+</Aside>
+
+### Example: Where to Create Files
+
+When the guide says "create in project root", it means:
+
+<FileTree>
+- my-astro-site/
+  - astro.config.mjs <Badge text="Root" variant="success" />
+  - wrangler.jsonc <Badge text="Root" variant="success" />
+  - package.json <Badge text="Root" variant="success" />
+</FileTree>
+
+<Aside type="caution">
+NOT inside `src/` or any subfolder!
+</Aside>
+
+---
+
+## Part 1: Creating an Astro Project
+
+### Step 1: Install Astro
+
+Open your terminal and run:
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+bun create astro@latest
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+npm create astro@latest
+```
+</TabItem>
+</Tabs>
+
+### Step 2: Follow the Setup Wizard
+
+You'll be asked several questions:
+
+```
+Where should we create your new project?
+→ my-astro-site
+
+How would you like to start your new project?
+→ Choose a starter template (or "Empty" for blank project)
+
+Install dependencies?
+→ Yes
+
+Do you plan to write TypeScript?
+→ Yes (recommended)
+
+Initialize a git repository?
+→ Yes (recommended)
+```
+
+### Step 3: Navigate to Your Project
+
+```bash
+cd my-astro-site
+```
+
+---
+
+## Part 2: Installing Cloudflare Adapter
+
+Astro needs an adapter to work with Cloudflare Workers.
+
+<Steps>
+1. **Install Cloudflare Adapter**
+
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun add @astrojs/cloudflare
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm install @astrojs/cloudflare
+   ```
+   </TabItem>
+   </Tabs>
+
+2. **Install Wrangler (Cloudflare CLI)**
+
+   Wrangler is Cloudflare's command-line tool for deployment.
+
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun add wrangler --dev
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm install wrangler --save-dev
+   ```
+   </TabItem>
+   </Tabs>
+
+</Steps>
+
+---
+
+## Part 3: Configure Your Project
+
+<Steps>
+1. **Update Astro Config**
+
+   Open `astro.config.mjs` and add the Cloudflare adapter:
+
+   ```javascript title="astro.config.mjs"
+   // astro.config.mjs
+   import { defineConfig } from 'astro/config';
+   import cloudflare from '@astrojs/cloudflare';
+
+   export default defineConfig({
+     output: 'server', // Enable SSR
+     adapter: cloudflare(),
+   });
+   ```
+   <Aside type="note">
+   The `output: 'server'` enables Server-Side Rendering (SSR) which Cloudflare Workers needs.
+   </Aside>
+
+2. **Create Wrangler Configuration**
+
+   Create a file named `wrangler.jsonc` **in your project root** (same level as `package.json`):
+
+   **File location:**
+   ```
+   my-astro-site/
+   ├── package.json
+   ├── wrangler.jsonc  ← Create here
+   └── astro.config.mjs
+   ```
+
+   <Tabs>
+   <TabItem label="wrangler.jsonc (recommended)">
+   ```json title="wrangler.jsonc"
+   {
+     "$schema": "node_modules/wrangler/config-schema.json",
+     "name": "my-astro-site",
+     "compatibility_date": "2025-10-13",
+     "workers_dev": true,
+     "assets": {
+       "directory": "./dist",
+       "not_found_handling": "404-page"
+     }
+   }
+   ```
+   </TabItem>
+   <TabItem label="wrangler.toml">
+   ```toml title="wrangler.toml"
+   name = "my-astro-site"
+   main = "./dist/_worker.js"
+   compatibility_date = "2025-10-13"
+   workers_dev = true
+
+   [site]
+   bucket = "./dist"
+   ```
+   </TabItem>
+   </Tabs>
+
+   **How to create:**
+
+   <Tabs>
+   <TabItem label="Terminal">
+   ```bash
+   # Make sure you're in project root
+   cd my-astro-site
+
+   # Create the file
+   touch wrangler.jsonc
+
+   # Then open it in your editor and paste the JSON above
+   ```
+   </TabItem>
+   <TabItem label="Manual">
+   Create manually in your code editor: File → New → Save as `wrangler.jsonc` in root.
+   </TabItem>
+   </Tabs>
+
+3. **Understanding .assetsignore File**
+
+   <Aside type="caution" title="Important">
+   The `.assetsignore` file goes in the `dist/` folder, NOT the root!
+   </Aside>
+
+   **File location:**
+   ```
+   my-astro-site/         ← Project root
+   ├── package.json
+   ├── wrangler.jsonc
+   └── dist/              ← Build output folder
+       ├── _worker.js
+       └── .assetsignore  ← Create here
+   ```
+
+   **The Problem:**
+   - The `dist/` folder is auto-generated when you run `bun run build`
+   - It gets deleted and recreated every time you build
+   - So `.assetsignore` needs to be recreated after each build
+
+   **Solution 1: Auto-create with deploy script**
+
+   Add this to your `package.json` scripts:
+
+   ```json title="package.json"
+   {
+     "scripts": {
+       "deploy": "npm run build && echo '_worker.js' > dist/.assetsignore && npx wrangler deploy"
+     }
+   }
+   ```
+
+   Now run: `npm run deploy` (or `bun run deploy`)
+
+   **Solution 2: Manual creation after build**
+
+   ```bash
+   # 1. Build first
+   bun run build
+
+   # 2. Create .assetsignore in dist folder
+   echo "_worker.js" > dist/.assetsignore
+
+   # 3. Deploy
+   npx wrangler deploy
+   ```
+
+   **File content:**
+   ```
+   _worker.js
+   ```
+
+   <Aside type="tip" title="Why we need it">
+   - Prevents Wrangler from uploading `_worker.js` as a static asset
+   - `_worker.js` is the Worker script, not a regular file
+   - Without this, deployment will fail with an error
+   </Aside>
+
+</Steps>
+
+---
+
+## Part 4: Set Up Cloudflare Account
+
+<Steps>
+1. **Create Cloudflare Account**
+
+   1. Go to [cloudflare.com](https://cloudflare.com)
+   2. Click **Sign Up**
+   3. Enter your email and password
+   4. Verify your email address
+
+2. **Get Your Account ID** <Badge text="Optional" variant="note" />
+
+   1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+   2. Click on **Workers & Pages** in the sidebar
+   3. Your Account ID is displayed on the right side
+   4. Copy it for later (you might need it)
+
+</Steps>
+
+---
+
+## Part 5: Authentication with Wrangler
+
+<Steps>
+1. **Login to Cloudflare via Wrangler**
+
+   Run this command in your terminal:
+
+   ```bash
+   npx wrangler login
+   ```
+
+   This will:
+   1. Open your browser automatically
+   2. Ask you to authorize Wrangler
+   3. Click **Allow** to grant permissions
+   4. Return to terminal - you'll see "Successfully logged in"
+
+2. **Verify Login**
+
+   Check if you're logged in:
+
+   ```bash
+   npx wrangler whoami
+   ```
+
+   You should see your account email and Account ID.
+
+</Steps>
+
+---
+
+## Part 6: Build and Deploy
+
+<Steps>
+1. **Test Locally First**
+
+   Before deploying, test your site locally:
+
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun run dev
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm run dev
+   ```
+   </TabItem>
+   </Tabs>
+
+   Visit `http://localhost:4321` to see your site.
+
+2. **Build Your Project**
+
+   Build your Astro site for production:
+
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun run build
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm run build
+   ```
+   </TabItem>
+   </Tabs>
+
+   This creates a `dist` folder with your built site.
+
+3. **Deploy to Cloudflare**
+
+   Deploy your site:
+
+   ```bash
+   npx wrangler deploy
+   ```
+
+   **What happens:**
+   - Uploads your built files to Cloudflare
+   - Creates a Worker
+   - Gives you a live URL like: `https://my-astro-site.YOUR-SUBDOMAIN.workers.dev`
+
+4. **Visit Your Live Site**
+
+   After deployment completes, you'll see:
+
+   ```
+   Deployed my-astro-site triggers (5.00 sec)
+     https://my-astro-site.YOUR-SUBDOMAIN.workers.dev
+   Current Version ID: abc123...
+   ```
+
+   Click the URL or copy it to your browser!
+
+</Steps>
+
+---
+
+## Part 7: Update Your Site
+
+### Step 17: Making Changes
+
+Whenever you update your site:
+
+<Steps>
+1. Make your changes in code
+
+2. Test locally
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun run dev
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm run dev
+   ```
+   </TabItem>
+   </Tabs>
+
+3. Build for production
+   <Tabs>
+   <TabItem label="Bun (recommended)">
+   ```bash
+   bun run build
+   ```
+   </TabItem>
+   <TabItem label="npm">
+   ```bash
+   npm run build
+   ```
+   </TabItem>
+   </Tabs>
+
+4. Deploy
+   ```bash
+   npx wrangler deploy
+   ```
+
+</Steps>
+
+**Quick command** (build + deploy in one line):
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+bun run build && npx wrangler deploy
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+npm run build && npx wrangler deploy
+```
+</TabItem>
+</Tabs>
+
+---
+
+## Configuration Files Reference
+
+### File Locations Overview
+
+Here's where each config file should be:
+
+<FileTree>
+- my-astro-site/ <Badge text="PROJECT ROOT" variant="note" />
+  - astro.config.mjs <Badge text="1. Astro config" variant="tip" />
+  - wrangler.jsonc <Badge text="2. Cloudflare config" variant="tip" />
+  - package.json <Badge text="3. Scripts" variant="tip" />
+  - .dev.vars <Badge text="4. Local env vars (optional)" variant="note" />
+  - src/
+  - dist/ Generated on build
+    - .assetsignore <Badge text="5. Wrangler ignore" variant="danger" />
+</FileTree>
+
+### Required Files
+
+Your project needs these configuration files:
+
+#### 1. `astro.config.mjs` <Badge text="Location: Root" variant="note" />
+
+```javascript title="astro.config.mjs"
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  output: 'server',
+  adapter: cloudflare(),
+});
+```
+
+#### 2. `wrangler.jsonc`
+
+```json title="wrangler.jsonc"
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-astro-site",
+  "compatibility_date": "2025-10-13",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}
+```
+
+#### 3. `.assetsignore`
+
+```
+_worker.js
+```
+
+#### 4. `package.json` Scripts
+
+```json title="package.json"
+{
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "bun run build && echo '_worker.js' > dist/.assetsignore && npx wrangler deploy"
+  }
+}
+```
+
+<Aside type="tip" title="What does the deploy script do?">
+The `deploy` script runs three commands in sequence:
+1. **`bun run build`** - Builds your Astro site
+2. **`echo '_worker.js' > dist/.assetsignore`** - Creates `.assetsignore` to prevent `_worker.js` upload error
+3. **`npx wrangler deploy`** - Deploys to Cloudflare Workers
+
+This one command handles the entire deployment process automatically!
+</Aside>
+
+---
+
+## Command Reference
+
+### Development Commands
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start local development server |
+| `bun run build` | Build project for production |
+| `bun run preview` | Preview production build locally |
+| `bun run deploy` | Build and deploy in one command |
+
+</TabItem>
+<TabItem label="npm">
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start local development server |
+| `npm run build` | Build project for production |
+| `npm run preview` | Preview production build locally |
+| `npm run deploy` | Build and deploy in one command |
+
+</TabItem>
+</Tabs>
+
+### Wrangler Commands
+
+<Aside type="note">
+Wrangler commands work the same regardless of whether you use Bun or npm.
+</Aside>
+
+| Command | Description |
+|---------|-------------|
+| `npx wrangler login` | Login to Cloudflare |
+| `npx wrangler logout` | Logout from Cloudflare |
+| `npx wrangler whoami` | Check current login status |
+| `npx wrangler deploy` | Deploy to Cloudflare Workers |
+| `npx wrangler tail` | View live logs from your worker |
+| `npx wrangler delete` | Delete your worker |
+
+### Deployment Commands
+
+<Aside type="tip" title="Recommended: Use the deploy script">
+The `deploy` script automatically handles build, `.assetsignore` creation, and deployment.
+</Aside>
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+
+**Quick Deployment:**
+```bash
+bun run deploy
+```
+
+**What it does:**
+1. Builds your Astro site
+2. Creates `.assetsignore` file (prevents `_worker.js` error)
+3. Deploys to Cloudflare Workers
+
+**Manual Steps (if needed):**
+```bash
+# 1. Build
+bun run build
+
+# 2. Create .assetsignore
+echo '_worker.js' > dist/.assetsignore
+
+# 3. Deploy
+npx wrangler deploy
+```
+
+</TabItem>
+<TabItem label="npm">
+
+**Quick Deployment:**
+```bash
+npm run deploy
+```
+
+**What it does:**
+1. Builds your Astro site
+2. Creates `.assetsignore` file (prevents `_worker.js` error)
+3. Deploys to Cloudflare Workers
+
+**Manual Steps (if needed):**
+```bash
+# 1. Build
+npm run build
+
+# 2. Create .assetsignore
+echo '_worker.js' > dist/.assetsignore
+
+# 3. Deploy
+npx wrangler deploy
+```
+
+</TabItem>
+</Tabs>
+
+---
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### Issue 1: "API Token Required"
+
+**Error:**
+```
+In a non-interactive environment, it's necessary to set a CLOUDFLARE_API_TOKEN
+```
+
+<Aside type="tip" title="Solution">
+Run `npx wrangler login` to authenticate.
+</Aside>
+
+#### Issue 2: "_worker.js Upload Error"
+
+**Error:**
+```
+Uploading a Pages _worker.js directory as an asset
+```
+
+<Aside type="tip" title="Solution">
+Create `.assetsignore` file with `_worker.js` content.
+</Aside>
+
+#### Issue 3: "Port Already in Use"
+
+**Error:**
+```
+Port 4321 is in use
+```
+
+<Aside type="note">
+Astro will automatically try the next port (4322, 4323, etc.)
+</Aside>
+
+#### Issue 4: Build Fails
+
+<Aside type="tip" title="Solution">
+1. Delete `node_modules` and `dist` folders
+2. Run `npm install` (or `bun install`)
+3. Try building again: `npm run build`
+</Aside>
+
+#### Issue 5: Worker Not Working After Deploy
+
+<Aside type="tip" title="Solution">
+1. Check your `astro.config.mjs` has `output: 'server'`
+2. Verify Cloudflare adapter is installed
+3. Rebuild and redeploy
+</Aside>
+
+---
+
+## Environment Variables (Advanced)
+
+### Setting Environment Variables
+
+If your app needs environment variables:
+
+<Steps>
+1. **Create `.dev.vars` File**
+
+   For local development:
+
+   ```env title=".dev.vars"
+   DATABASE_URL=your-database-url
+   API_KEY=your-api-key
+   ```
+
+2. **Add to Cloudflare**
+
+   For production, add secrets via Wrangler:
+
+   ```bash
+   npx wrangler secret put DATABASE_URL
+   # Enter your value when prompted
+   ```
+
+   Or add in `wrangler.jsonc`:
+
+   ```json title="wrangler.jsonc"
+   {
+     "vars": {
+       "ENVIRONMENT": "production"
+     }
+   }
+   ```
+
+</Steps>
+
+---
+
+## Custom Domain (Optional)
+
+### Adding Your Own Domain
+
+<Steps>
+1. **Add Domain to Cloudflare**
+
+   1. Go to Cloudflare Dashboard
+   2. Click **Add Site**
+   3. Enter your domain
+   4. Follow DNS setup instructions
+
+2. **Add Route to Worker**
+
+   In `wrangler.jsonc`, add:
+
+   ```json title="wrangler.jsonc"
+   {
+     "routes": [
+       {
+         "pattern": "yourdomain.com/*",
+         "zone_name": "yourdomain.com"
+       }
+     ]
+   }
+   ```
+
+3. **Deploy**
+
+   ```bash
+   npx wrangler deploy
+   ```
+
+   Your site will be available at your custom domain!
+
+</Steps>
+
+---
+
+## Best Practices
+
+<Aside type="tip" title="Best Practices">
+
+### 1. Use Version Control
+
+Always commit your code to Git:
+
+```bash
+git add .
+git commit -m "Deploy to Cloudflare"
+git push
+```
+
+### 2. Test Before Deploy
+
+Always run `npm run dev` and test locally before deploying.
+
+### 3. Keep Dependencies Updated
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+bun update
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+npm update
+```
+</TabItem>
+</Tabs>
+
+### 4. Use Environment Variables
+
+Never commit secrets/API keys. Use Wrangler secrets or `.dev.vars`.
+
+### 5. Monitor Your Site
+
+Use Cloudflare Dashboard to monitor:
+- Traffic
+- Errors
+- Performance
+
+</Aside>
+
+---
+
+## Next Steps
+
+Now that your site is deployed:
+
+1. **Add More Pages** - Create new `.astro` files in `src/pages/`
+2. **Customize Design** - Edit your components and styles
+3. **Add Features** - Install Astro integrations
+4. **Set Up CI/CD** - Automate deployments with GitHub Actions
+5. **Monitor Performance** - Use Cloudflare Analytics
+
+---
+
+## Useful Links
+
+<LinkCard
+  title="Astro Documentation"
+  description="Official Astro documentation and guides"
+  href="https://docs.astro.build"
+/>
+
+<LinkCard
+  title="Cloudflare Workers Docs"
+  description="Learn about Cloudflare Workers platform"
+  href="https://developers.cloudflare.com/workers"
+/>
+
+<LinkCard
+  title="Wrangler CLI Docs"
+  description="Command-line tool for Cloudflare Workers"
+  href="https://developers.cloudflare.com/workers/wrangler"
+/>
+
+<LinkCard
+  title="Astro Cloudflare Adapter"
+  description="Official adapter documentation"
+  href="https://docs.astro.build/en/guides/integrations-guide/cloudflare"
+/>
+
+---
+
+## Summary
+
+You've learned how to:
+
+- Install and set up Astro
+- Add Cloudflare adapter
+- Configure Wrangler
+- Authenticate with Cloudflare
+- Build and deploy your site
+- Update and redeploy
+- Troubleshoot common issues
+
+<Aside type="tip" title="Quick Deploy Commands">
+
+**Full Deployment (Recommended):**
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+bun run deploy
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+npm run deploy
+```
+</TabItem>
+</Tabs>
+
+**Or Step by Step:**
+
+<Tabs>
+<TabItem label="Bun (recommended)">
+```bash
+# 1. Build
+bun run build
+
+# 2. Create .assetsignore
+echo '_worker.js' > dist/.assetsignore
+
+# 3. Deploy
+npx wrangler deploy
+```
+</TabItem>
+<TabItem label="npm">
+```bash
+# 1. Build
+npm run build
+
+# 2. Create .assetsignore
+echo '_worker.js' > dist/.assetsignore
+
+# 3. Deploy
+npx wrangler deploy
+```
+</TabItem>
+</Tabs>
+
+</Aside>
+
+Happy deploying!

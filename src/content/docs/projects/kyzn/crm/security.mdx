@@ -1,0 +1,348 @@
+---
+title: Project 3 - Security Best Practices
+description: Advanced security configuration and best practices for Project 3
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+# Security Best Practices
+
+Enterprise-grade security configuration for Project 3.
+
+<Aside type="caution">
+**Triple-nested page!** This demonstrates the deepest level of sidebar nesting.  
+Projects → Project 3 → Advanced → Security
+</Aside>
+
+## Security Checklist
+
+- ✅ Authentication & Authorization
+- ✅ Data Encryption (in transit & at rest)
+- ✅ Input Validation & Sanitization
+- ✅ Rate Limiting & DDoS Protection
+- ✅ Security Headers
+- ✅ Dependency Scanning
+- ✅ Secret Management
+- ✅ Audit Logging
+
+## Authentication
+
+### JWT Configuration
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+// Generate token with short expiry
+function generateToken(user) {
+  return jwt.sign(
+    { 
+      id: user.id, 
+      email: user.email,
+      role: user.role 
+    },
+    process.env.JWT_SECRET,
+    { 
+      expiresIn: '15m',  // Short-lived access token
+      algorithm: 'HS256'
+    }
+  );
+}
+
+// Refresh token (longer expiry, stored securely)
+function generateRefreshToken(user) {
+  return jwt.sign(
+    { id: user.id },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+```
+
+### Password Security
+
+<Steps>
+
+1. **Hash passwords with bcrypt**
+   ```javascript
+   const bcrypt = require('bcrypt');
+   const SALT_ROUNDS = 12;
+   
+   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+   ```
+
+2. **Enforce strong password policy**
+   - Minimum 12 characters
+   - At least 1 uppercase letter
+   - At least 1 lowercase letter
+   - At least 1 number
+   - At least 1 special character
+
+3. **Implement rate limiting on login attempts**
+   ```javascript
+   const rateLimit = require('express-rate-limit');
+   
+   const loginLimiter = rateLimit({
+     windowMs: 15 * 60 * 1000, // 15 minutes
+     max: 5, // 5 attempts
+     message: 'Too many login attempts, please try again later'
+   });
+   ```
+
+4. **Use 2FA for sensitive operations**
+
+</Steps>
+
+## Data Encryption
+
+### HTTPS Configuration
+
+<Tabs>
+<TabItem label="Nginx">
+
+```nginx
+server {
+  listen 443 ssl http2;
+  server_name example.com;
+  
+  ssl_certificate /path/to/cert.pem;
+  ssl_certificate_key /path/to/key.pem;
+  
+  # Strong SSL configuration
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers HIGH:!aNULL:!MD5;
+  ssl_prefer_server_ciphers on;
+  
+  # HSTS
+  add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+}
+```
+
+</TabItem>
+<TabItem label="Node.js">
+
+```javascript
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem'),
+  minVersion: 'TLSv1.2'
+};
+
+https.createServer(options, app).listen(443);
+```
+
+</TabItem>
+</Tabs>
+
+### Database Encryption
+
+```sql
+-- Encrypt sensitive columns
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Encrypt data at rest
+CREATE TABLE sensitive_data (
+  id SERIAL PRIMARY KEY,
+  encrypted_ssn BYTEA NOT NULL,
+  encrypted_card BYTEA NOT NULL
+);
+
+-- Insert encrypted data
+INSERT INTO sensitive_data (encrypted_ssn, encrypted_card)
+VALUES (
+  pgp_sym_encrypt('123-45-6789', 'encryption-key'),
+  pgp_sym_encrypt('4111-1111-1111-1111', 'encryption-key')
+);
+```
+
+## Security Headers
+
+```javascript
+const helmet = require('helmet');
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  noSniff: true,
+  xssFilter: true,
+  frameguard: { action: 'deny' }
+}));
+```
+
+## Input Validation
+
+```javascript
+const { body, validationResult } = require('express-validator');
+
+app.post('/api/users',
+  [
+    body('email').isEmail().normalizeEmail(),
+    body('password').isLength({ min: 12 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/),
+    body('name').trim().escape().isLength({ min: 2, max: 50 }),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    // Process validated input
+  }
+);
+```
+
+## Rate Limiting
+
+```javascript
+const rateLimit = require('express-rate-limit');
+const RedisStore = require('rate-limit-redis');
+
+const limiter = rateLimit({
+  store: new RedisStore({
+    client: redisClient
+  }),
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP'
+});
+
+app.use('/api/', limiter);
+```
+
+## Secret Management
+
+<Aside type="danger">
+**Never commit secrets to version control!**
+</Aside>
+
+### Using Environment Variables
+
+```bash
+# .env (never commit this file!)
+DATABASE_URL=postgresql://user:password@localhost/db
+JWT_SECRET=your-super-secret-key-min-32-chars
+ENCRYPTION_KEY=another-secret-key-for-encryption
+```
+
+### Using Secret Management Services
+
+<Tabs>
+<TabItem label="AWS Secrets Manager">
+
+```javascript
+const AWS = require('aws-sdk');
+const secretsManager = new AWS.SecretsManager();
+
+async function getSecret(secretName) {
+  const data = await secretsManager.getSecretValue({ 
+    SecretId: secretName 
+  }).promise();
+  
+  return JSON.parse(data.SecretString);
+}
+```
+
+</TabItem>
+<TabItem label="HashiCorp Vault">
+
+```javascript
+const vault = require('node-vault')({
+  endpoint: 'http://vault:8200',
+  token: process.env.VAULT_TOKEN
+});
+
+async function getSecret(path) {
+  const result = await vault.read(path);
+  return result.data;
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Dependency Scanning
+
+Regularly scan for vulnerabilities:
+
+```bash
+# npm
+npm audit
+npm audit fix
+
+# Snyk
+snyk test
+snyk monitor
+```
+
+## Audit Logging
+
+```javascript
+function auditLog(action, user, resource, details) {
+  logger.info({
+    timestamp: new Date().toISOString(),
+    action,
+    userId: user.id,
+    userEmail: user.email,
+    resource,
+    details,
+    ip: req.ip,
+    userAgent: req.get('user-agent')
+  });
+}
+
+// Usage
+auditLog('USER_LOGIN', user, 'auth', { method: 'password' });
+auditLog('DATA_ACCESS', user, 'users/123', { action: 'read' });
+auditLog('DATA_MODIFICATION', user, 'users/123', { 
+  action: 'update',
+  fields: ['email', 'name']
+});
+```
+
+## Security Testing
+
+### Penetration Testing Checklist
+
+- [ ] SQL Injection
+- [ ] XSS (Cross-Site Scripting)
+- [ ] CSRF (Cross-Site Request Forgery)
+- [ ] Authentication bypass
+- [ ] Authorization bypass
+- [ ] Session management
+- [ ] File upload vulnerabilities
+- [ ] API security
+- [ ] Infrastructure security
+
+### Tools
+
+- **OWASP ZAP** - Automated security testing
+- **Burp Suite** - Manual penetration testing
+- **SQLMap** - SQL injection testing
+- **Nmap** - Network scanning
+
+## Compliance
+
+Ensure compliance with:
+
+- **GDPR** - Data protection and privacy
+- **SOC 2** - Security controls
+- **HIPAA** - Healthcare data (if applicable)
+- **PCI DSS** - Payment card data (if applicable)
+
+## Related Pages
+
+- [Performance Optimization](/projects/project-3/advanced/performance)
+- [Configuration](/projects/project-3/configuration)
+- [Getting Started](/projects/project-3/getting-started)

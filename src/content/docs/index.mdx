@@ -3,49 +3,136 @@ title: Developer Documentation
 description: Your personal development documentation hub for tutorials, guides, and technical explanations.
 ---
 
-# Welcome to Dev Bahrul
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Card } from '@astrojs/starlight/components';
 
-This is my personal development documentation website - a curated collection of knowledge, tutorials, and technical guides that I've compiled throughout my development journey.
-
-## What You'll Find Here
-
-This documentation site serves as my digital reference library, containing:
-
-### Tutorials
-Step-by-step guides on various technologies, frameworks, and tools that I work with regularly. These tutorials are written in a way that I can quickly reference and follow when needed.
-
-### Technical Explanations
-Deep dives into technical concepts, architectures, and implementation details. This section helps me understand the "why" behind the "how" of various technologies.
-
-### How-To Guides
-Practical, solution-oriented guides for common development tasks and challenges. Quick reference materials for when I need to accomplish something specific.
-
-### Best Practices
-Documentation of best practices, patterns, and conventions that I follow in my development work.
-
-## Why This Exists
-
-As a developer, I found myself repeatedly searching for the same solutions, concepts, and implementation details. This documentation site is my way of:
-
-- **Centralizing Knowledge**: Keeping all my learnings and references in one place
-- **Quick Access**: Having instant access to solutions I've documented before
-- **Learning Through Writing**: Reinforcing my understanding by documenting what I learn
-- **Future Reference**: Creating a resource that grows with my development journey
-
-## How It's Organized
-
-The documentation is organized into logical sections that make it easy to find what I'm looking for:
-
-- **Guides**: Comprehensive tutorials and walkthroughs
-- **Reference**: Quick reference materials and technical documentation
-- **More sections coming soon**: As I add more content, I'll organize it appropriately
-
-## Continuously Evolving
-
-This is a living documentation that evolves with my development journey. I'll be continuously adding new content, refining existing documentation, and organizing information as I learn and grow as a developer.
-
-Feel free to explore, and I hope you find something useful here!
+Your personal development documentation hub - a curated collection of knowledge, tutorials, and technical guides compiled throughout my development journey.
 
 ---
 
-*Last updated: October 2025*
+## 🚀 Quick Start
+
+<CardGrid stagger>
+  <LinkCard
+    title="GitHub CLI Guide"
+    description="Complete step-by-step guide from account creation to pushing code with GitHub CLI"
+    href="/guides/learn-github/"
+  />
+  <LinkCard
+    title="Install MCP Server"
+    description="Setup Model Context Protocol servers for Claude Code, Zed, and VS Code"
+    href="/guides/learn-mcp-server/"
+  />
+  <LinkCard
+    title="Astro + Cloudflare"
+    description="Deploy Astro projects to Cloudflare Workers - complete deployment guide"
+    href="/deployment/astro-cloudflare/"
+  />
+  <LinkCard
+    title="Tech Stack Dashboard"
+    description="Modern dashboard tech stack with React, Cloudflare, and Neon PostgreSQL"
+    href="/reference/tech-stack-dashboard/"
+  />
+</CardGrid>
+
+---
+
+## 📚 What You'll Find Here
+
+<CardGrid>
+  <Card title="Tutorials" icon="open-book">
+    Step-by-step guides on technologies, frameworks, and tools. Written for quick reference and easy following when you need to get things done.
+  </Card>
+
+  <Card title="Technical Explanations" icon="information">
+    Deep dives into technical concepts, architectures, and implementation details. Understanding the "why" behind the "how" of various technologies.
+  </Card>
+
+  <Card title="How-To Guides" icon="rocket">
+    Practical, solution-oriented guides for common development tasks and challenges. Quick reference materials for specific problems.
+  </Card>
+
+  <Card title="Best Practices" icon="star">
+    Documentation of patterns, conventions, and best practices followed in modern development work.
+  </Card>
+</CardGrid>
+
+---
+
+## 🎯 Why This Exists
+
+As a developer, I found myself repeatedly searching for the same solutions, concepts, and implementation details. This documentation site is my way of:
+
+<CardGrid>
+  <Card title="Centralizing Knowledge" icon="puzzle">
+    Keep all learnings and references organized in one accessible place
+  </Card>
+
+  <Card title="Quick Access" icon="forward-slash">
+    Instant access to solutions and documentation without endless searching
+  </Card>
+
+  <Card title="Learning Through Writing" icon="pencil">
+    Reinforce understanding by documenting concepts and implementations
+  </Card>
+
+  <Card title="Future Reference" icon="setting">
+    Create a growing resource that evolves with the development journey
+  </Card>
+</CardGrid>
+
+---
+
+## 🗂️ Documentation Structure
+
+<CardGrid stagger>
+  <LinkCard
+    title="📖 Guides"
+    description="Comprehensive tutorials and walkthroughs for various technologies"
+    href="/guides/learn-github/"
+  />
+  <LinkCard
+    title="📚 Reference"
+    description="Quick reference materials and technical documentation"
+    href="/reference/tech-stack-dashboard/"
+  />
+  <LinkCard
+    title="🚀 Deployment"
+    description="Deployment guides for Cloudflare and other platforms"
+    href="/deployment/astro-cloudflare/"
+  />
+</CardGrid>
+
+---
+
+## 🌱 Continuously Evolving
+
+This is a **living documentation** that grows with every project and learning experience:
+
+- ✅ Regularly updated with new content
+- ✅ Refined based on real-world usage
+- ✅ Organized for maximum accessibility
+- ✅ Tested and verified implementations
+
+---
+
+## 📬 Get in Touch
+
+Found this helpful? Have suggestions? Feel free to reach out!
+
+<CardGrid>
+  <LinkCard
+    title="GitHub Profile"
+    description="Check out my projects and contributions"
+    href="https://github.com/bahrulbangsawan"
+  />
+  <LinkCard
+    title="Live Site"
+    description="Visit the production deployment"
+    href="https://dev.bahrul.me"
+  />
+</CardGrid>
+
+---
+
+*Last updated: October 2025 • Built with [Astro](https://astro.build) & [Starlight](https://starlight.astro.build)*

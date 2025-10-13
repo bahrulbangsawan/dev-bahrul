@@ -1,0 +1,187 @@
+---
+title: Project 3 - Performance Optimization
+description: Advanced performance optimization techniques for Project 3
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+# Performance Optimization
+
+Advanced performance tuning for Project 3.
+
+<Aside type="note">
+**You're in a triple-nested page!**  
+Projects → Project 3 → Advanced → Performance
+</Aside>
+
+## Overview
+
+This guide covers advanced performance optimization techniques including:
+
+- Database query optimization
+- Caching strategies
+- Load balancing
+- Resource allocation
+- Monitoring and profiling
+
+## Database Optimization
+
+### Connection Pooling
+
+Configure optimal connection pool size:
+
+```javascript
+// database.js
+const pool = new Pool({
+  min: 10,
+  max: 100,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+```
+
+### Query Optimization
+
+<Tabs>
+<TabItem label="Slow Query">
+
+```sql
+-- ❌ Slow: No index, full table scan
+SELECT * FROM users 
+WHERE email = 'user@example.com';
+```
+
+</TabItem>
+<TabItem label="Optimized Query">
+
+```sql
+-- ✅ Fast: Uses index
+CREATE INDEX idx_users_email ON users(email);
+
+SELECT id, name, email FROM users 
+WHERE email = 'user@example.com';
+```
+
+</TabItem>
+</Tabs>
+
+### Query Performance Tips
+
+1. **Use indexes** on frequently queried columns
+2. **Avoid SELECT \*** - select only needed columns
+3. **Use EXPLAIN ANALYZE** to understand query execution
+4. **Batch operations** instead of individual queries
+5. **Use prepared statements** to prevent SQL injection and improve performance
+
+## Caching Strategy
+
+### Multi-Level Caching
+
+```
+Request → L1 (Memory) → L2 (Redis) → Database
+```
+
+Implementation:
+
+```javascript
+async function getUser(id) {
+  // L1: Memory cache (fast)
+  let user = memoryCache.get(`user:${id}`);
+  if (user) return user;
+  
+  // L2: Redis cache (medium)
+  user = await redis.get(`user:${id}`);
+  if (user) {
+    memoryCache.set(`user:${id}`, user);
+    return JSON.parse(user);
+  }
+  
+  // L3: Database (slow)
+  user = await db.users.findById(id);
+  await redis.setex(`user:${id}`, 3600, JSON.stringify(user));
+  memoryCache.set(`user:${id}`, user);
+  
+  return user;
+}
+```
+
+### Cache Invalidation
+
+```javascript
+// Invalidate on update
+async function updateUser(id, data) {
+  await db.users.update(id, data);
+  
+  // Clear all cache levels
+  memoryCache.del(`user:${id}`);
+  await redis.del(`user:${id}`);
+}
+```
+
+## Load Balancing
+
+### Nginx Configuration
+
+```nginx
+upstream backend {
+  least_conn;  # Use least connections algorithm
+  
+  server backend1:3000 weight=3;
+  server backend2:3000 weight=2;
+  server backend3:3000 weight=1;
+  
+  keepalive 32;
+}
+
+server {
+  location / {
+    proxy_pass http://backend;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+  }
+}
+```
+
+## Monitoring
+
+### Key Metrics to Track
+
+| Metric | Target | Critical |
+|--------|--------|----------|
+| Response Time | &lt;100ms | &gt;500ms |
+| Database Query Time | &lt;50ms | &gt;200ms |
+| Cache Hit Rate | &gt;80% | &lt;50% |
+| CPU Usage | &lt;70% | &gt;90% |
+| Memory Usage | &lt;80% | &gt;95% |
+
+### Prometheus Metrics
+
+```javascript
+const prometheus = require('prom-client');
+
+const httpRequestDuration = new prometheus.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [5, 10, 25, 50, 100, 250, 500, 1000]
+});
+```
+
+## Performance Benchmarks
+
+After optimization:
+
+- **Response Time**: 45ms (from 250ms) - 82% improvement
+- **Database Queries**: 15ms (from 120ms) - 87% improvement  
+- **Cache Hit Rate**: 92% (from 35%) - 163% improvement
+- **Throughput**: 5000 req/s (from 800 req/s) - 525% improvement
+
+<Aside type="tip">
+Always measure before and after optimization. Use load testing tools like k6 or Apache JMeter.
+</Aside>
+
+## Next Steps
+
+- [Security Best Practices](/projects/project-3/advanced/security)
+- [Configuration Guide](/projects/project-3/configuration)
+- [Getting Started](/projects/project-3/getting-started)
