@@ -1,0 +1,307 @@
+---
+title: "Claude Code Installation Guide"
+description: "Complete guide to install and configure Claude Code on Windows and macOS with Z.ai API integration"
+pubDate: "2024-10-19"
+heroImage: "/placeholder-hero.jpg"
+tags: ["claude-code", "installation", "windows", "macos", "api-setup"]
+layout: "../../layouts/BlogPost.astro"
+---
+
+# Claude Code Installation Guide
+
+This guide will help you install and configure Claude Code on both Windows and macOS systems, including setup for using with the Z.ai API.
+
+## Table of Contents
+
+- [System Requirements](#system-requirements)
+- [Windows Installation](#windows-installation)
+- [macOS Installation](#macos-installation)
+- [API Configuration](#api-configuration)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+
+## System Requirements
+
+- **Windows**: Windows 10 or later
+- **macOS**: macOS 10.15 (Catalina) or later
+- **Node.js**: Version 18.0 or higher (recommended)
+- **Internet connection** for API access
+
+## Windows Installation
+
+### Method 1: Using npm (Recommended)
+
+1. **Install Node.js**
+   - Download Node.js from [https://nodejs.org](https://nodejs.org)
+   - Run the installer and follow the setup wizard
+   - Verify installation by opening Command Prompt and running:
+     ```cmd
+     node --version
+     npm --version
+     ```
+
+2. **Install Claude Code**
+   ```cmd
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+3. **Configure PowerShell Profile**
+   - Open PowerShell
+   - Check if profile exists:
+     ```powershell
+     Test-Path $PROFILE
+     ```
+   - If it returns `False`, create the profile:
+     ```powershell
+     New-Item -Path $PROFILE -Type File -Force
+     ```
+   - Edit the profile (use notepad or VS Code):
+     ```powershell
+     notepad $PROFILE
+     ```
+   - Add the following lines to your profile:
+     ```powershell
+     # Claude Code Alias
+     Set-Alias claude-zai "claude"
+
+     # Claude Code API Configuration
+     $env:ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga"
+     $env:ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+     ```
+   - Save the file and restart PowerShell
+
+### Method 2: Using Chocolatey
+
+1. **Install Chocolatey** (if not already installed)
+   - Open PowerShell as Administrator
+   - Run:
+     ```powershell
+     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+     ```
+
+2. **Install Claude Code**
+   ```cmd
+   choco install claude-code
+   ```
+
+3. **Configure Environment Variables**
+   - Press `Win + R`, type `sysdm.cpl` and press Enter
+   - Go to "Advanced" tab → "Environment Variables"
+   - Under "User variables", click "New":
+     - Variable name: `ANTHROPIC_API_KEY`
+     - Variable value: `f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga`
+   - Click "New" again:
+     - Variable name: `ANTHROPIC_BASE_URL`
+     - Variable value: `https://api.z.ai/api/anthropic`
+   - Click OK on all windows
+
+## macOS Installation
+
+### Method 1: Using npm (Recommended)
+
+1. **Install Homebrew** (if not already installed)
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Install Node.js**
+   ```bash
+   brew install node
+   ```
+
+3. **Install Claude Code**
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+4. **Configure Shell Profile**
+   - Open your terminal
+   - Identify your shell (run `echo $SHELL`):
+     - If using bash: `~/.bash_profile` or `~/.bashrc`
+     - If using zsh: `~/.zshrc`
+
+   - Edit your profile file:
+     ```bash
+     # For zsh (most modern macOS)
+     nano ~/.zshrc
+
+     # For bash
+     nano ~/.bash_profile
+     ```
+
+   - Add the following lines:
+     ```bash
+     # Claude Code Alias
+     alias claude-zai='ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga" ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" claude --dangerously-skip-permissions'
+
+     # Claude Code Environment Variables (alternative approach)
+     export ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga"
+     export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+     ```
+
+   - Apply the changes:
+     ```bash
+     # For zsh
+     source ~/.zshrc
+
+     # For bash
+     source ~/.bash_profile
+     ```
+
+### Method 2: Using Homebrew
+
+1. **Install Claude Code via Homebrew**
+   ```bash
+   brew install claude-code
+   ```
+
+2. **Configure Environment**
+   - Follow step 4 from Method 1 to configure your shell profile
+
+## API Configuration
+
+### Environment Variables
+
+The following environment variables need to be set for Claude Code to work with Z.ai:
+
+- **ANTHROPIC_API_KEY**: `f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga`
+- **ANTHROPIC_BASE_URL**: `https://api.z.ai/api/anthropic`
+
+### Windows PowerShell Commands
+
+```powershell
+# Set environment variables for current session
+$env:ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga"
+$env:ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+
+# Set permanently (requires admin privileges)
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga", "User")
+[Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://api.z.ai/api/anthropic", "User")
+```
+
+### macOS/Linux Commands
+
+```bash
+# Set environment variables for current session
+export ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga"
+export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+
+# Add to shell profile for permanent configuration
+echo 'export ANTHROPIC_API_KEY="f1e6b39b52084d70a0560405abb646c3.KKDS8XJpL6NwL1Ga"' >> ~/.zshrc
+echo 'export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"' >> ~/.zshrc
+```
+
+## Verification
+
+### Test Your Installation
+
+1. **Check Claude Code Version**
+   ```bash
+   claude --version
+   ```
+
+2. **Test API Connection**
+   ```bash
+   # Using the configured alias
+   claude-zai --version
+
+   # Or directly with claude
+   claude --version
+   ```
+
+3. **Run a Simple Command**
+   ```bash
+   claude "Hello, can you help me with coding?"
+   ```
+
+### Verify Environment Variables
+
+**Windows:**
+```powershell
+Get-ChildItem Env: | Where-Object {$_.Name -like "*ANTHROPIC*"}
+```
+
+**macOS/Linux:**
+```bash
+env | grep ANTHROPIC
+```
+
+## Usage Examples
+
+### Basic Usage
+
+```bash
+# Ask Claude to help with a coding task
+claude "Create a Python function that calculates fibonacci numbers"
+
+# Use the alias with Z.ai configuration
+claude-zai "Explain this React component to me"
+```
+
+### File Operations
+
+```bash
+# Analyze a file
+claude "Analyze this file and suggest improvements" path/to/file.js
+
+# Generate code for a new file
+claude "Create a basic Express.js server" > server.js
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Command not found" error**
+   - Ensure Node.js is properly installed
+   - Check that npm global bin directory is in your PATH
+   - Try reinstalling: `npm install -g @anthropic-ai/claude-code`
+
+2. **API Key not working**
+   - Verify the API key is correctly set
+   - Check for extra spaces or quotes
+   - Ensure the base URL is correct: `https://api.z.ai/api/anthropic`
+
+3. **Permission errors**
+   - On Windows, run PowerShell as Administrator when setting permanent environment variables
+   - On macOS, you might need to use `sudo` for global npm installs
+
+4. **Network issues**
+   - Check your internet connection
+   - Verify firewall settings allow API calls
+   - Try accessing the API endpoint directly in a browser
+
+### Getting Help
+
+- Check the official Claude Code documentation
+- Run `claude --help` for command-line options
+- For issues specific to Z.ai API, contact their support
+
+### Reset Configuration
+
+If you need to reset your configuration:
+
+**Windows:**
+```powershell
+# Remove environment variables
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", $null, "User")
+[Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", $null, "User")
+```
+
+**macOS/Linux:**
+```bash
+# Remove from shell profile
+sed -i '/ANTHROPIC_API_KEY/d' ~/.zshrc
+sed -i '/ANTHROPIC_BASE_URL/d' ~/.zshrc
+```
+
+## Next Steps
+
+After installation, you can:
+
+1. Explore Claude Code's features with `claude --help`
+2. Read the official documentation for advanced usage
+3. Set up project-specific configurations
+4. Integrate with your favorite IDE or editor
+
+Happy coding with Claude Code! 🚀
